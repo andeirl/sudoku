@@ -16,7 +16,7 @@ public class Cell {
     private final int rowIndex;
     private final int columnIndex;
 
-    private int value;
+    private Integer value;
 
     private final List<Integer> remainingVariants;
 
@@ -38,16 +38,15 @@ public class Cell {
         return columnIndex;
     }
 
-    public int getValue() {
+    public Integer getValue() {
         return value;
     }
 
-    public void setValue(int value) {
-        this.value = value;
-    }
-
-    public List<Integer> getRemainingVariants() {
-        return remainingVariants;
+    public void excludeVariant(Integer variantToExclude) {
+        remainingVariants.remove(variantToExclude);
+        if (remainingVariants.size() == 1) {
+            value = remainingVariants.remove(0);
+        }
     }
 
     @Override
