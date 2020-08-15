@@ -6,13 +6,10 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static io.andrewtxt.sudoku.model.Table.COLUMN_NUMBER;
-import static io.andrewtxt.sudoku.model.Table.ROW_NUMBER;
-
 public class Cell {
 
     private static final List<Integer> VARIANTS = IntStream
-            .range(1, ROW_NUMBER * COLUMN_NUMBER + 1)
+            .range(1, Table.ROW_NUMBER * Table.COLUMN_NUMBER + 1)
             .boxed()
             .collect(Collectors.toList());
 
