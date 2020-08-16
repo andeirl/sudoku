@@ -1,7 +1,10 @@
 package io.andrewtxt.sudoku.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class Table {
 
@@ -42,6 +45,30 @@ public class Table {
 
     public List<Table> getColumnNeighbours() {
         return columnNeighbours;
+    }
+
+    public Stream<Cell> getEmptyConnectedCells(int row, int column) {
+        return Stream.<Stream<Cell>>builder()
+                .add(cells.stream())
+                .add(rowNeighborsCells(row))
+                .add(columnNeighborsCells(column))
+                .build()
+                .flatMap(Function.identity())
+                .filter(cell -> cell.getValue() == null);
+    }
+
+    private Stream<Cell> rowNeighborsCells(int row) {
+        return rowNeighbours
+                .stream()
+                .map(neighbor -> neighbor.rows.get(row).getCells())
+                .flatMap(Collection::stream);
+    }
+
+    private Stream<Cell> columnNeighborsCells(int column) {
+        return columnNeighbours
+                .stream()
+                .map(neighbor -> neighbor.columns.get(column).getCells())
+                .flatMap(Collection::stream);
     }
 
     private List<Cell> toCells(int[][] values) {
