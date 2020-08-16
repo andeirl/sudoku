@@ -14,7 +14,7 @@ public class Cell {
     private static final int SUB_TABLE_COLUMN_NUMBER = 3;
 
     private static final List<Integer> VARIANTS = IntStream
-            .range(1, Table.ROW_NUMBER * Table.COLUMN_NUMBER + 1)
+            .range(1, Cell.SUB_TABLE_ROW_NUMBER * Cell.SUB_TABLE_COLUMN_NUMBER + 1)
             .boxed()
             .collect(Collectors.toList());
 
