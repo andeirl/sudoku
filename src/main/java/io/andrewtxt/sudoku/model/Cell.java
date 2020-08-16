@@ -23,9 +23,9 @@ public class Cell {
     public Cell(int rowIndex, int columnIndex, int value) {
         this.rowIndex = rowIndex;
         this.columnIndex = columnIndex;
-        this.value = value;
+        this.value = value == 0 ? null : value;
         this.remainingVariants = new ArrayList<>();
-        if (value == 0) {
+        if (this.value == null) {
             remainingVariants.addAll(VARIANTS);
         }
     }
@@ -42,7 +42,7 @@ public class Cell {
         return value;
     }
 
-    public void excludeVariant(Integer variantToExclude) {
+    public void tryExcludeVariantAndSetValue(Integer variantToExclude) {
         remainingVariants.remove(variantToExclude);
         if (remainingVariants.size() == 1) {
             value = remainingVariants.remove(0);
