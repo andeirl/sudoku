@@ -16,6 +16,10 @@ public class SuperTable {
         connectTables();
     }
 
+    public List<Table> getTables() {
+        return tables;
+    }
+
     private List<Table> toTables(int[][] values) {
         List<Table> result = new ArrayList<>();
         for (int i = 0; i < SuperTable.ROW_NUMBER; i++) {

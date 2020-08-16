@@ -39,6 +39,10 @@ public class Table {
         return columnIndex;
     }
 
+    public List<Cell> getCells() {
+        return cells;
+    }
+
     public List<Table> getRowNeighbours() {
         return rowNeighbours;
     }
@@ -75,7 +79,7 @@ public class Table {
         List<Cell> result = new ArrayList<>();
         for (int i = 0; i < ROW_NUMBER; i++) {
             for (int j = 0; j < COLUMN_NUMBER; j++) {
-                result.add(new Cell(i, j, values[i][j]));
+                result.add(new Cell(i, j, values[i][j], this));
             }
         }
         return result;

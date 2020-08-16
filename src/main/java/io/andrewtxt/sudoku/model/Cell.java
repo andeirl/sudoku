@@ -17,13 +17,15 @@ public class Cell {
     private final int columnIndex;
 
     private Integer value;
+    private Table parentTable;
 
     private final List<Integer> remainingVariants;
 
-    public Cell(int rowIndex, int columnIndex, int value) {
+    public Cell(int rowIndex, int columnIndex, int value, Table parentTable) {
         this.rowIndex = rowIndex;
         this.columnIndex = columnIndex;
         this.value = value == 0 ? null : value;
+        this.parentTable = parentTable;
         this.remainingVariants = new ArrayList<>();
         if (this.value == null) {
             remainingVariants.addAll(VARIANTS);
@@ -40,6 +42,10 @@ public class Cell {
 
     public Integer getValue() {
         return value;
+    }
+
+    public Table getParentTable() {
+        return parentTable;
     }
 
     public void tryExcludeVariantAndSetValue(Integer variantToExclude) {
