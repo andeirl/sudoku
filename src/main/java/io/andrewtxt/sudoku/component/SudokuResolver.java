@@ -5,6 +5,7 @@ import io.andrewtxt.sudoku.model.SuperTable;
 import io.andrewtxt.sudoku.model.Table;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,9 +24,9 @@ public class SudokuResolver {
     }
 
     private List<Cell> getNotEmptyCells(SuperTable superTable) {
-        return superTable.getTables()
+        return superTable.getCells()
                 .stream()
-                .flatMap(table -> table.getCells().stream())
+                .flatMap(Collection::stream)
                 .filter(cell -> cell.getValue() != null)
                 .collect(Collectors.toList());
     }
@@ -42,9 +43,7 @@ public class SudokuResolver {
     }
 
     private void tryFillEmptyConnectedCells(Cell cell, List<Cell> filledCells) {
-        int rowIndex = cell.getRowIndex();
-        int columnIndex = cell.getColumnIndex();
-        Stream<Cell> emptyConnectedCells = cell.getEmptyConnectedCells(rowIndex, columnIndex);
+        Stream<Cell> emptyConnectedCells = cell.getActualEmptyConnectedCells();
         emptyConnectedCells
                 .filter(connectedCell -> tryFillEmptyConnectedCell(connectedCell, cell.getValue()))
                 .forEach(filledCells::add);

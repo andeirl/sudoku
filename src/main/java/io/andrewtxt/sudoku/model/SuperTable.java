@@ -5,77 +5,51 @@ import java.util.stream.Collectors;
 
 public class SuperTable {
 
-    public static final int ROW_NUMBER = 3;
-    public static final int COLUMN_NUMBER = 3;
+    public static final int ROW_NUMBER = 9;
+    public static final int COLUMN_NUMBER = 9;
 
-    private final List<Table> tables;
+    private final List<List<Cell>> cells;
 
     public SuperTable(int[][] values) {
-        this.tables = toTables(values);
-        connectTables();
+        this.cells = toCells(values);
+        connectCells();
     }
 
-    public List<Table> getTables() {
-        return tables;
+    public List<List<Cell>> getCells() {
+        return cells;
     }
 
     @Override
     public String toString() {
-        List<Cell> sortedCells = tables
-                .stream()
-                .flatMap(table -> table.getCells().stream())
-                .sorted(Comparator
-                        .comparingInt(Cell::getParentRowIndex)
-                        .thenComparingInt(Cell::getRowIndex)
-                        .thenComparingInt(Cell::getParentColumnIndex)
-                        .thenComparingInt(Cell::getColumnIndex))
-                .collect(Collectors.toList());
-        int rowLength = SuperTable.ROW_NUMBER * Table.ROW_NUMBER;
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < sortedCells.size(); i++) {
-            builder.append(Optional.ofNullable(sortedCells.get(i).getValue()).orElse(0));
-            if (i % rowLength == rowLength - 1) {
-                builder.append("\n");
-            }
+        List<String> lines = new ArrayList<>();
+        for (int i = 0; i < ROW_NUMBER; i++) {
+            String line = cells.get(i)
+                    .stream()
+                    .map(cell -> Optional.ofNullable(cell.getValue()).orElse(0))
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(""));
+            lines.add(line);
         }
-        return builder.toString();
+        return String.join("\n", lines);
     }
 
-    private List<Table> toTables(int[][] values) {
-        List<Table> result = new ArrayList<>();
-        for (int i = 0; i < SuperTable.ROW_NUMBER; i++) {
-            for (int j = 0; j < SuperTable.COLUMN_NUMBER; j++) {
-                int[][] tableValues = new int[Table.ROW_NUMBER][Table.COLUMN_NUMBER];
-                for (int k = 0; k < Table.ROW_NUMBER; k++) {
-                    tableValues[k] = Arrays.copyOfRange(
-                            values[Table.ROW_NUMBER * i + k],
-                            Table.COLUMN_NUMBER * j,
-                            Table.COLUMN_NUMBER * j + Table.COLUMN_NUMBER
-                    );
-                }
-                result.add(new Table(i, j, tableValues));
+    private List<List<Cell>> toCells(int[][] values) {
+        List<List<Cell>> result = new ArrayList<>();
+        for (int i = 0; i < ROW_NUMBER; i++) {
+            int[] arrayRow = values[i];
+            List<Cell> listRow = new ArrayList<>();
+            result.add(listRow);
+            for (int j = 0; j < COLUMN_NUMBER; j++) {
+                listRow.add(new Cell(i, j, arrayRow[j], this));
             }
         }
         return result;
     }
 
-    private void connectTables() {
-        for (Table table : tables) {
-            findNeighbours(table);
-        }
-    }
-
-    private void findNeighbours(Table baseTable) {
-        int baseTableRowIndex = baseTable.getRowIndex();
-        int baseTableColumnIndex = baseTable.getColumnIndex();
-        for (Table table : tables) {
-            if (table.getRowIndex() == baseTableRowIndex && table.getColumnIndex() != baseTableColumnIndex) {
-                baseTable.getRowNeighbours().add(table);
-            }
-            if (table.getColumnIndex() == baseTableColumnIndex && table.getRowIndex() != baseTableRowIndex) {
-                baseTable.getColumnNeighbours().add(table);
-            }
-        }
+    private void connectCells() {
+        cells.stream()
+                .flatMap(Collection::stream)
+                .forEach(Cell::initEmptyConnectedCells);
     }
 
 }

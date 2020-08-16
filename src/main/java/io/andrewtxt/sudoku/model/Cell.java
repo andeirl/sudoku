@@ -1,6 +1,7 @@
 package io.andrewtxt.sudoku.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -8,6 +9,9 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Cell {
+
+    private static final int SUB_TABLE_ROW_NUMBER = 3;
+    private static final int SUB_TABLE_COLUMN_NUMBER = 3;
 
     private static final List<Integer> VARIANTS = IntStream
             .range(1, Table.ROW_NUMBER * Table.COLUMN_NUMBER + 1)
@@ -18,11 +22,12 @@ public class Cell {
     private final int columnIndex;
 
     private Integer value;
+    private List<Cell> initialEmptyConnectedCells;
 
     private final List<Integer> remainingVariants;
-    private final Table parentTable;
+    private final SuperTable parentTable;
 
-    public Cell(int rowIndex, int columnIndex, int value, Table parentTable) {
+    public Cell(int rowIndex, int columnIndex, int value, SuperTable parentTable) {
         this.rowIndex = rowIndex;
         this.columnIndex = columnIndex;
         this.value = value == 0 ? null : value;
@@ -41,20 +46,14 @@ public class Cell {
         return columnIndex;
     }
 
-    public int getParentRowIndex() {
-        return parentTable.getRowIndex();
-    }
-
-    public int getParentColumnIndex() {
-        return parentTable.getColumnIndex();
-    }
-
     public Integer getValue() {
         return value;
     }
 
-    public Stream<Cell> getEmptyConnectedCells(int rowIndex, int columnIndex) {
-        return parentTable.getEmptyConnectedCells(rowIndex, columnIndex);
+    public Stream<Cell> getActualEmptyConnectedCells() {
+        return initialEmptyConnectedCells
+                .stream()
+                .filter(cell -> cell.getValue() == null);
     }
 
     public void tryExcludeVariantAndSetValue(Integer variantToExclude) {
@@ -79,6 +78,32 @@ public class Cell {
     @Override
     public int hashCode() {
         return Objects.hash(rowIndex, columnIndex);
+    }
+
+    void initEmptyConnectedCells() {
+        List<Cell> initialEmptyCells = parentTable.getCells()
+                .stream()
+                .flatMap(Collection::stream)
+                .filter(this::isConnected)
+                .collect(Collectors.toList());
+        this.initialEmptyConnectedCells = initialEmptyCells;
+    }
+
+    private boolean isConnected(Cell cell) {
+        return !this.equals(cell) && (fromThisRow(cell) || fromThisColumn(cell) || fromThisSubTable(cell));
+    }
+
+    private boolean fromThisRow(Cell cell) {
+        return rowIndex == cell.rowIndex;
+    }
+
+    private boolean fromThisColumn(Cell cell) {
+        return columnIndex == cell.columnIndex;
+    }
+
+    private boolean fromThisSubTable(Cell cell) {
+        return (rowIndex / SUB_TABLE_ROW_NUMBER == cell.rowIndex / SUB_TABLE_ROW_NUMBER) &&
+                (columnIndex / SUB_TABLE_COLUMN_NUMBER == cell.columnIndex / SUB_TABLE_COLUMN_NUMBER);
     }
 
 }
