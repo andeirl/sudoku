@@ -6,9 +6,10 @@ import io.andrewtxt.sudoku.component.SudokuResolver;
 public class Application {
 
     public static void main(String[] args) {
+        System.out.println("Application is started");
         int[][] data = new DataReader().readData();
         new SudokuResolver().resolve(data);
-        System.out.println("Application started");
+        System.out.println("Application is stopped");
     }
 
 }
