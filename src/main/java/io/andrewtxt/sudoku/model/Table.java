@@ -3,14 +3,14 @@ package io.andrewtxt.sudoku.model;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class SuperTable {
+public class Table {
 
     public static final int ROW_NUMBER = 9;
     public static final int COLUMN_NUMBER = 9;
 
     private final List<List<Cell>> cells;
 
-    public SuperTable(int[][] values) {
+    public Table(int[][] values) {
         this.cells = toCells(values);
         connectCells();
     }

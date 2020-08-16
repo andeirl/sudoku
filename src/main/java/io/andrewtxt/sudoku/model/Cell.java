@@ -25,9 +25,9 @@ public class Cell {
     private List<Cell> initialEmptyConnectedCells;
 
     private final List<Integer> remainingVariants;
-    private final SuperTable parentTable;
+    private final Table parentTable;
 
-    public Cell(int rowIndex, int columnIndex, int value, SuperTable parentTable) {
+    public Cell(int rowIndex, int columnIndex, int value, Table parentTable) {
         this.rowIndex = rowIndex;
         this.columnIndex = columnIndex;
         this.value = value == 0 ? null : value;

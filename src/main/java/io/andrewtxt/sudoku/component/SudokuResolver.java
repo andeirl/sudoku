@@ -1,7 +1,7 @@
 package io.andrewtxt.sudoku.component;
 
 import io.andrewtxt.sudoku.model.Cell;
-import io.andrewtxt.sudoku.model.SuperTable;
+import io.andrewtxt.sudoku.model.Table;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,17 +12,17 @@ import java.util.stream.Stream;
 
 public class SudokuResolver {
 
-    private static final int CELLS_NUMBER = SuperTable.ROW_NUMBER * SuperTable.COLUMN_NUMBER;
+    private static final int CELLS_NUMBER = Table.ROW_NUMBER * Table.COLUMN_NUMBER;
 
     public void resolve(int[][] values) {
-        SuperTable superTable = new SuperTable(values);
-        List<Cell> notEmptyCells = getNotEmptyCells(superTable);
+        Table table = new Table(values);
+        List<Cell> notEmptyCells = getNotEmptyCells(table);
         tryFillCells(notEmptyCells, notEmptyCells);
-        System.out.println(superTable);
+        System.out.println(table);
     }
 
-    private List<Cell> getNotEmptyCells(SuperTable superTable) {
-        return superTable.getCells()
+    private List<Cell> getNotEmptyCells(Table table) {
+        return table.getCells()
                 .stream()
                 .flatMap(Collection::stream)
                 .filter(cell -> cell.getValue() != null)
