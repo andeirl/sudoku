@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class SudokuResolver {
 
@@ -15,31 +14,30 @@ public class SudokuResolver {
 
     public void resolve(int[][] values) {
         Table table = new Table(values);
-        List<Cell> notEmptyCells = getNotEmptyCells(table);
-        tryFillCells(notEmptyCells, notEmptyCells);
+        List<Cell> filledCells = getFilledCells(table);
+        tryFillCells(filledCells, filledCells);
         System.out.println(table);
     }
 
-    private List<Cell> getNotEmptyCells(Table table) {
+    private List<Cell> getFilledCells(Table table) {
         return table.getCellStream()
                 .filter(cell -> cell.getValue() != null)
                 .collect(Collectors.toList());
     }
 
-    private void tryFillCells(List<Cell> oldGen, List<Cell> allFilledCells) {
-        if (oldGen.isEmpty()) {
+    private void tryFillCells(List<Cell> prevFilledCells, List<Cell> allFilledCells) {
+        if (prevFilledCells.isEmpty()) {
             return;
         }
-        List<Cell> newGen = new ArrayList<>();
-        Collections.shuffle(oldGen);
-        oldGen.forEach(cell -> tryFillEmptyConnectedCells(cell, newGen));
-        allFilledCells.addAll(newGen);
-        tryFillCells(newGen, allFilledCells);
+        List<Cell> nextFilledCells = new ArrayList<>();
+        Collections.shuffle(prevFilledCells);
+        prevFilledCells.forEach(cell -> tryFillEmptyConnectedCells(cell, nextFilledCells));
+        allFilledCells.addAll(nextFilledCells);
+        tryFillCells(nextFilledCells, allFilledCells);
     }
 
     private void tryFillEmptyConnectedCells(Cell cell, List<Cell> filledCells) {
-        Stream<Cell> emptyConnectedCells = cell.getActualEmptyConnectedCells();
-        emptyConnectedCells
+        cell.getActualEmptyConnectedCells()
                 .filter(connectedCell -> tryFillEmptyConnectedCell(connectedCell, cell.getValue()))
                 .forEach(filledCells::add);
     }

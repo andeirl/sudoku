@@ -26,8 +26,7 @@ public class Table {
         for (int i = 0; i < ROW_NUMBER; i++) {
             String line = cells.get(i)
                     .stream()
-                    .map(cell -> Optional.ofNullable(cell.getValue()).orElse(0))
-                    .map(String::valueOf)
+                    .map(Object::toString)
                     .collect(Collectors.joining(""));
             lines.add(line);
         }
@@ -37,11 +36,9 @@ public class Table {
     private List<List<Cell>> toCells(int[][] values) {
         List<List<Cell>> result = new ArrayList<>();
         for (int i = 0; i < ROW_NUMBER; i++) {
-            int[] arrayRow = values[i];
-            List<Cell> listRow = new ArrayList<>();
-            result.add(listRow);
+            result.add(new ArrayList<>());
             for (int j = 0; j < COLUMN_NUMBER; j++) {
-                listRow.add(new Cell(i, j, arrayRow[j], this));
+                result.get(i).add(new Cell(i, j, values[i][j], this));
             }
         }
         return result;

@@ -3,6 +3,7 @@ package io.andrewtxt.sudoku.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -35,14 +36,6 @@ public class Cell {
         if (this.value == null) {
             remainingVariants.addAll(VARIANTS);
         }
-    }
-
-    public int getRowIndex() {
-        return rowIndex;
-    }
-
-    public int getColumnIndex() {
-        return columnIndex;
     }
 
     public Integer getValue() {
@@ -79,6 +72,11 @@ public class Cell {
         return Objects.hash(rowIndex, columnIndex);
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(Optional.ofNullable(value).orElse(0));
+    }
+
     void initEmptyConnectedCells() {
         List<Cell> initialEmptyCells = parentTable.getCellStream()
                 .filter(this::isConnected)
@@ -87,18 +85,19 @@ public class Cell {
     }
 
     private boolean isConnected(Cell cell) {
-        return !this.equals(cell) && (fromThisRow(cell) || fromThisColumn(cell) || fromThisSubTable(cell));
+        return !this.equals(cell) &&
+                (isFromThisRow(cell) || isFromThisColumn(cell) || isFromThisSubTable(cell));
     }
 
-    private boolean fromThisRow(Cell cell) {
+    private boolean isFromThisRow(Cell cell) {
         return rowIndex == cell.rowIndex;
     }
 
-    private boolean fromThisColumn(Cell cell) {
+    private boolean isFromThisColumn(Cell cell) {
         return columnIndex == cell.columnIndex;
     }
 
-    private boolean fromThisSubTable(Cell cell) {
+    private boolean isFromThisSubTable(Cell cell) {
         return (rowIndex / SUB_TABLE_ROW_NUMBER == cell.rowIndex / SUB_TABLE_ROW_NUMBER) &&
                 (columnIndex / SUB_TABLE_COLUMN_NUMBER == cell.columnIndex / SUB_TABLE_COLUMN_NUMBER);
     }
