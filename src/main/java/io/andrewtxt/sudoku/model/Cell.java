@@ -1,7 +1,6 @@
 package io.andrewtxt.sudoku.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -81,9 +80,7 @@ public class Cell {
     }
 
     void initEmptyConnectedCells() {
-        List<Cell> initialEmptyCells = parentTable.getCells()
-                .stream()
-                .flatMap(Collection::stream)
+        List<Cell> initialEmptyCells = parentTable.getCellStream()
                 .filter(this::isConnected)
                 .collect(Collectors.toList());
         this.initialEmptyConnectedCells = initialEmptyCells;

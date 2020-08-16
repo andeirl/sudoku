@@ -4,7 +4,6 @@ import io.andrewtxt.sudoku.model.Cell;
 import io.andrewtxt.sudoku.model.Table;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,9 +21,7 @@ public class SudokuResolver {
     }
 
     private List<Cell> getNotEmptyCells(Table table) {
-        return table.getCells()
-                .stream()
-                .flatMap(Collection::stream)
+        return table.getCellStream()
                 .filter(cell -> cell.getValue() != null)
                 .collect(Collectors.toList());
     }

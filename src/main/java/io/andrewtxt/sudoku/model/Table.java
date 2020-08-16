@@ -2,6 +2,7 @@ package io.andrewtxt.sudoku.model;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Table {
 
@@ -15,8 +16,8 @@ public class Table {
         connectCells();
     }
 
-    public List<List<Cell>> getCells() {
-        return cells;
+    public Stream<Cell> getCellStream() {
+        return cells.stream().flatMap(Collection::stream);
     }
 
     @Override
