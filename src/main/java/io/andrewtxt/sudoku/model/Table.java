@@ -15,12 +15,17 @@ public class Table {
     private final List<Row> rows;
     private final List<Column> columns;
 
+    private final List<Table> rowNeighbours;
+    private final List<Table> columnNeighbours;
+
     public Table(int rowIndex, int columnIndex, int[][] values) {
         this.rowIndex = rowIndex;
         this.columnIndex = columnIndex;
         this.cells = toCells(values);
         this.rows = toRows(cells);
         this.columns = toColumns(cells);
+        this.rowNeighbours = new ArrayList<>();
+        this.columnNeighbours = new ArrayList<>();
     }
 
     public int getRowIndex() {
@@ -29,6 +34,14 @@ public class Table {
 
     public int getColumnIndex() {
         return columnIndex;
+    }
+
+    public List<Table> getRowNeighbours() {
+        return rowNeighbours;
+    }
+
+    public List<Table> getColumnNeighbours() {
+        return columnNeighbours;
     }
 
     private List<Cell> toCells(int[][] values) {

@@ -13,6 +13,7 @@ public class SuperTable {
 
     public SuperTable(int[][] values) {
         this.tables = toTables(values);
+        connectTables();
     }
 
     private List<Table> toTables(int[][] values) {
@@ -31,6 +32,25 @@ public class SuperTable {
             }
         }
         return result;
+    }
+
+    private void connectTables() {
+        for (Table table : tables) {
+            findNeighbours(table);
+        }
+    }
+
+    private void findNeighbours(Table baseTable) {
+        int baseTableRowIndex = baseTable.getRowIndex();
+        int baseTableColumnIndex = baseTable.getColumnIndex();
+        for (Table table : tables) {
+            if (table.getRowIndex() == baseTableRowIndex && table.getColumnIndex() != baseTableColumnIndex) {
+                baseTable.getRowNeighbours().add(table);
+            }
+            if (table.getColumnIndex() == baseTableColumnIndex && table.getRowIndex() != baseTableRowIndex) {
+                baseTable.getColumnNeighbours().add(table);
+            }
+        }
     }
 
 }
