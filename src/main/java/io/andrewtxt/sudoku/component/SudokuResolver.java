@@ -2,7 +2,6 @@ package io.andrewtxt.sudoku.component;
 
 import io.andrewtxt.sudoku.model.Cell;
 import io.andrewtxt.sudoku.model.SuperTable;
-import io.andrewtxt.sudoku.model.Table;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,8 +12,7 @@ import java.util.stream.Stream;
 
 public class SudokuResolver {
 
-    private static final int CELLS_NUMBER = SuperTable.ROW_NUMBER * Table.ROW_NUMBER *
-            SuperTable.COLUMN_NUMBER * Table.COLUMN_NUMBER;
+    private static final int CELLS_NUMBER = SuperTable.ROW_NUMBER * SuperTable.COLUMN_NUMBER;
 
     public void resolve(int[][] values) {
         SuperTable superTable = new SuperTable(values);
