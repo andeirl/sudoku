@@ -17,9 +17,9 @@ public class Cell {
     private final int columnIndex;
 
     private Integer value;
-    private Table parentTable;
 
     private final List<Integer> remainingVariants;
+    private final Table parentTable;
 
     public Cell(int rowIndex, int columnIndex, int value, Table parentTable) {
         this.rowIndex = rowIndex;
@@ -38,6 +38,14 @@ public class Cell {
 
     public int getColumnIndex() {
         return columnIndex;
+    }
+
+    public int getParentRowIndex() {
+        return parentTable.getRowIndex();
+    }
+
+    public int getParentColumnIndex() {
+        return parentTable.getColumnIndex();
     }
 
     public Integer getValue() {

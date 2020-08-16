@@ -1,8 +1,7 @@
 package io.andrewtxt.sudoku.model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SuperTable {
 
@@ -18,6 +17,28 @@ public class SuperTable {
 
     public List<Table> getTables() {
         return tables;
+    }
+
+    @Override
+    public String toString() {
+        List<Cell> sortedCells = tables
+                .stream()
+                .flatMap(table -> table.getCells().stream())
+                .sorted(Comparator
+                        .comparingInt(Cell::getParentRowIndex)
+                        .thenComparingInt(Cell::getRowIndex)
+                        .thenComparingInt(Cell::getParentColumnIndex)
+                        .thenComparingInt(Cell::getColumnIndex))
+                .collect(Collectors.toList());
+        int rowLength = SuperTable.ROW_NUMBER * Table.ROW_NUMBER;
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < sortedCells.size(); i++) {
+            builder.append(Optional.ofNullable(sortedCells.get(i).getValue()).orElse(0));
+            if (i % rowLength == rowLength - 1) {
+                builder.append("\n");
+            }
+        }
+        return builder.toString();
     }
 
     private List<Table> toTables(int[][] values) {

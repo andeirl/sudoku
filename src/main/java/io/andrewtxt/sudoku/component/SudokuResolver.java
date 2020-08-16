@@ -19,6 +19,7 @@ public class SudokuResolver {
         SuperTable superTable = new SuperTable(values);
         List<Cell> notEmptyCells = getNotEmptyCells(superTable);
         tryFillCells(notEmptyCells, notEmptyCells);
+        System.out.println(superTable);
     }
 
     private List<Cell> getNotEmptyCells(SuperTable superTable) {
