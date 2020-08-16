@@ -44,7 +44,7 @@ public class SudokuResolver {
     private void tryFillEmptyConnectedCells(Cell cell, List<Cell> filledCells) {
         int rowIndex = cell.getRowIndex();
         int columnIndex = cell.getColumnIndex();
-        Stream<Cell> emptyConnectedCells = cell.getParentTable().getEmptyConnectedCells(rowIndex, columnIndex);
+        Stream<Cell> emptyConnectedCells = cell.getEmptyConnectedCells(rowIndex, columnIndex);
         emptyConnectedCells
                 .filter(connectedCell -> tryFillEmptyConnectedCell(connectedCell, cell.getValue()))
                 .forEach(filledCells::add);

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Cell {
 
@@ -52,8 +53,8 @@ public class Cell {
         return value;
     }
 
-    public Table getParentTable() {
-        return parentTable;
+    public Stream<Cell> getEmptyConnectedCells(int rowIndex, int columnIndex) {
+        return parentTable.getEmptyConnectedCells(rowIndex, columnIndex);
     }
 
     public void tryExcludeVariantAndSetValue(Integer variantToExclude) {
