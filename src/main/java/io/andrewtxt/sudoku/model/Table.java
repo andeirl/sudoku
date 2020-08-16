@@ -8,8 +8,8 @@ import java.util.stream.Stream;
 
 public class Table {
 
-    static final int ROW_NUMBER = 3;
-    static final int COLUMN_NUMBER = 3;
+    public static final int ROW_NUMBER = 3;
+    public static final int COLUMN_NUMBER = 3;
 
     private final int rowIndex;
     private final int columnIndex;

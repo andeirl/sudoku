@@ -6,8 +6,8 @@ import java.util.List;
 
 public class SuperTable {
 
-    private static final int ROW_NUMBER = 3;
-    private static final int COLUMN_NUMBER = 3;
+    public static final int ROW_NUMBER = 3;
+    public static final int COLUMN_NUMBER = 3;
 
     private final List<Table> tables;
 
