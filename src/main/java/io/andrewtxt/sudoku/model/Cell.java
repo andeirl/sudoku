@@ -1,9 +1,6 @@
 package io.andrewtxt.sudoku.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -42,10 +39,20 @@ public class Cell {
         return value;
     }
 
+    public List<Integer> getRemainingVariants() {
+        return remainingVariants;
+    }
+
     public Stream<Cell> getActualEmptyConnectedCells() {
         return initialEmptyConnectedCells
                 .stream()
                 .filter(cell -> cell.getValue() == null);
+    }
+
+    public Stream<Cell> getActualEmptyConnectedCellsSorted() {
+        return getActualEmptyConnectedCells()
+                .sorted(Comparator.comparing(cell -> cell.getRemainingVariants().size()))
+                .sorted(Comparator.comparing((Cell cell) -> cell.getActualEmptyConnectedCells().count()).reversed());
     }
 
     public void tryExcludeVariantAndSetValue(Integer variantToExclude) {
@@ -53,6 +60,10 @@ public class Cell {
         if (remainingVariants.size() == 1) {
             value = remainingVariants.remove(0);
         }
+    }
+
+    public void setVariantAsValueNonExcluding(Integer variant) {
+        this.value = variant;
     }
 
     @Override
