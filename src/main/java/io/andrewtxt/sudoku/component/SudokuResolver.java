@@ -40,13 +40,13 @@ public class SudokuResolver {
     }
 
     private void tryFillCells(List<Cell> prevFilledCells, List<Cell> allFilledCells) {
-        if (prevFilledCells.isEmpty()) {
-            return;
-        }
         List<Cell> nextFilledCells = new ArrayList<>();
         Collections.shuffle(prevFilledCells);
         prevFilledCells.forEach(cell -> tryFillEmptyConnectedCells(cell, nextFilledCells));
         allFilledCells.addAll(nextFilledCells);
+        if (prevFilledCells.isEmpty()) {
+            return;
+        }
         tryFillCells(nextFilledCells, allFilledCells);
     }
 
