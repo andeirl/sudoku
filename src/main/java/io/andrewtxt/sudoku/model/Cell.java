@@ -96,15 +96,15 @@ public class Cell {
                 (isFromThisRow(cell) || isFromThisColumn(cell) || isFromThisSubTable(cell));
     }
 
-    private boolean isFromThisRow(Cell cell) {
+    public boolean isFromThisRow(Cell cell) {
         return rowIndex == cell.rowIndex;
     }
 
-    private boolean isFromThisColumn(Cell cell) {
+    public boolean isFromThisColumn(Cell cell) {
         return columnIndex == cell.columnIndex;
     }
 
-    private boolean isFromThisSubTable(Cell cell) {
+    public boolean isFromThisSubTable(Cell cell) {
         return (rowIndex / SUB_TABLE_ROW_NUMBER == cell.rowIndex / SUB_TABLE_ROW_NUMBER) &&
                 (columnIndex / SUB_TABLE_COLUMN_NUMBER == cell.columnIndex / SUB_TABLE_COLUMN_NUMBER);
     }
