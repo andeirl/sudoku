@@ -44,7 +44,7 @@ public class SudokuResolver {
         Collections.shuffle(prevFilledCells);
         prevFilledCells.forEach(cell -> tryFillEmptyConnectedCells(cell, nextFilledCells));
         allFilledCells.addAll(nextFilledCells);
-        if (prevFilledCells.isEmpty()) {
+        if (nextFilledCells.isEmpty()) {
             return;
         }
         tryFillCells(nextFilledCells, allFilledCells);
