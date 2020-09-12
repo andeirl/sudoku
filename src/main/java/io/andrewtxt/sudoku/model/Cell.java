@@ -61,6 +61,10 @@ public class Cell {
         }
     }
 
+    public void tryExcludeVariantsAndSetValue(List<Integer> variantsToExclude) {
+        variantsToExclude.forEach(this::tryExcludeVariantAndSetValue);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
