@@ -49,10 +49,9 @@ public class Cell {
                 .filter(cell -> cell.getValue() == null);
     }
 
-    public Stream<Cell> getActualEmptyConnectedCellsSorted() {
-        return getActualEmptyConnectedCells()
-                .sorted(Comparator.comparing(cell -> cell.getRemainingVariants().size()))
-                .sorted(Comparator.comparing((Cell cell) -> cell.getActualEmptyConnectedCells().count()).reversed());
+    public Stream<Cell> getConnectedCells() {
+        return parentTable.getCellStream()
+                .filter(this::isConnected);
     }
 
     public void tryExcludeVariantAndSetValue(Integer variantToExclude) {
@@ -60,10 +59,6 @@ public class Cell {
         if (remainingVariants.size() == 1) {
             value = remainingVariants.remove(0);
         }
-    }
-
-    public void setVariantAsValueNonExcluding(Integer variant) {
-        this.value = variant;
     }
 
     @Override
@@ -89,10 +84,7 @@ public class Cell {
     }
 
     void initEmptyConnectedCells() {
-        List<Cell> initialEmptyCells = parentTable.getCellStream()
-                .filter(this::isConnected)
-                .collect(Collectors.toList());
-        this.initialEmptyConnectedCells = initialEmptyCells;
+        this.initialEmptyConnectedCells = getConnectedCells().collect(Collectors.toList());
     }
 
     private boolean isConnected(Cell cell) {
