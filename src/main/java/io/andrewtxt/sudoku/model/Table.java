@@ -20,6 +20,17 @@ public class Table {
         return cells.stream().flatMap(Collection::stream);
     }
 
+    public boolean hasEmptyCells() {
+        return getCellStream()
+                .map(Cell::getValue)
+                .anyMatch((Integer value) -> value == null || value.equals(0));
+    }
+
+    public boolean hasCollisions() {
+        return getCellStream()
+                .anyMatch((Cell cell) -> hasValue(cell.getConnectedCells(), cell.getValue()));
+    }
+
     @Override
     public String toString() {
         List<String> lines = new ArrayList<>();
@@ -48,6 +59,13 @@ public class Table {
         cells.stream()
                 .flatMap(Collection::stream)
                 .forEach(Cell::initEmptyConnectedCells);
+    }
+
+    private boolean hasValue(Stream<Cell> cellStream, Integer value) {
+        return cellStream
+                .map(Cell::getValue)
+                .filter(Objects::nonNull)
+                .anyMatch(cellValue -> cellValue.equals(value));
     }
 
 }

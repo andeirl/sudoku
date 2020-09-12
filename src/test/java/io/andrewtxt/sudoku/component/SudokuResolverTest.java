@@ -20,7 +20,8 @@ public class SudokuResolverTest {
                 {1, 0, 2, 0, 0, 8, 3, 5, 0}
         };
         Table table = new SudokuResolver().resolve(values);
-        Assertions.assertThat(table.getCellStream().noneMatch(cell -> cell.getValue() == null));
+        Assertions.assertThat(table.hasEmptyCells()).isFalse();
+        Assertions.assertThat(table.hasCollisions()).isFalse();
     }
 
     @Test
@@ -37,7 +38,8 @@ public class SudokuResolverTest {
                 {8, 5, 0, 0, 0, 0, 4, 0, 0}
         };
         Table table = new SudokuResolver().resolve(values);
-        Assertions.assertThat(table.getCellStream().noneMatch(cell -> cell.getValue() == null));
+        Assertions.assertThat(table.hasEmptyCells()).isFalse();
+        Assertions.assertThat(table.hasCollisions()).isFalse();
     }
 
 }
