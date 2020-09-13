@@ -10,6 +10,8 @@ public class Cell {
     private static final int SUB_TABLE_ROW_NUMBER = 3;
     private static final int SUB_TABLE_COLUMN_NUMBER = 3;
 
+    private static final String VALUE_FORMAT = "         ";
+
     private static final List<Integer> VARIANTS = IntStream
             .range(1, Cell.SUB_TABLE_ROW_NUMBER * Cell.SUB_TABLE_COLUMN_NUMBER + 1)
             .boxed()
@@ -65,6 +67,13 @@ public class Cell {
         variantsToExclude.forEach(this::tryExcludeVariantAndSetValue);
     }
 
+    public void trySetValue(Integer value) {
+        if (remainingVariants.contains(value)) {
+            this.value = value;
+            remainingVariants.clear();
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -84,7 +93,14 @@ public class Cell {
 
     @Override
     public String toString() {
-        return String.valueOf(Optional.ofNullable(value).orElse(0));
+        if (value == null) {
+            String variantsStr = remainingVariants
+                    .stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(""));
+            return " " + variantsStr + VALUE_FORMAT.substring(variantsStr.length()) + " ";
+        }
+        return " " + value.toString() + VALUE_FORMAT.substring(1) + " ";
     }
 
     void initEmptyConnectedCells() {
