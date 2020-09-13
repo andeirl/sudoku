@@ -6,9 +6,8 @@ import io.andrewtxt.sudoku.model.Table;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,15 +40,24 @@ public class SudokuResolver {
     }
 
     private void tryFillCells(List<Cell> prevFilledCells, List<Cell> allFilledCells, Table table) {
-        if (prevFilledCells.isEmpty()) {
-            return;
-        }
         List<Cell> nextFilledCells = new ArrayList<>();
         Collections.shuffle(prevFilledCells);
         prevFilledCells.forEach(cell -> tryFillEmptyConnectedCells(cell, nextFilledCells));
-        allFilledCells.addAll(nextFilledCells);
         if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
             removeSameVariants(table, nextFilledCells);
+        }
+        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+            removeExclusiveVariants(table, nextFilledCells, Cell::isFromThisRow);
+        }
+        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+            removeExclusiveVariants(table, nextFilledCells, Cell::isFromThisColumn);
+        }
+        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+            removeExclusiveVariants(table, nextFilledCells, Cell::isFromThisSubTable);
+        }
+        allFilledCells.addAll(nextFilledCells);
+        if (nextFilledCells.isEmpty()) {
+            return;
         }
         tryFillCells(nextFilledCells, allFilledCells, table);
     }
@@ -63,6 +71,7 @@ public class SudokuResolver {
 
     private void removeSameVariants(Cell cell, List<Cell> filledCells) {
         List<Cell> cells = cell.getActualEmptyConnectedCells().collect(Collectors.toList());
+        cells.add(cell);
         tryFillSameVariantsConnectedCells(cells.stream().filter((Cell c) -> c.isFromThisRow(cell)), filledCells);
         tryFillSameVariantsConnectedCells(cells.stream().filter((Cell c) -> c.isFromThisColumn(cell)), filledCells);
         tryFillSameVariantsConnectedCells(cells.stream().filter((Cell c) -> c.isFromThisSubTable(cell)), filledCells);
@@ -88,6 +97,36 @@ public class SudokuResolver {
                         });
             }
         }
+    }
+
+    private void removeExclusiveVariants(Table table, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
+        List<Cell> cells = table.getCellStream()
+                .filter(cell -> cell.getValue() == null || cell.getValue().equals(0))
+                .collect(Collectors.toList());
+        cells.forEach(cell -> removeExclusiveVariants(cell, filledCells, condition));
+    }
+
+    private void removeExclusiveVariants(Cell cell, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
+        List<Cell> cells = cell.getActualEmptyConnectedCells().collect(Collectors.toList());
+        cells.add(cell);
+        tryFillExclusiveVariantsConnectedCells(cells.stream().filter(c -> condition.test(c, cell)), filledCells);
+    }
+
+    private void tryFillExclusiveVariantsConnectedCells(Stream<Cell> cellStream, List<Cell> filledCells) {
+        Map<Integer, List<Cell>> cells = new TreeMap<>();
+        cellStream.forEach(cell ->
+                cell.getRemainingVariants().forEach(variant ->
+                        cells.computeIfAbsent(variant, v -> new ArrayList<>()).add(cell)));
+        cells.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().size() == 1)
+                .forEach(entry -> {
+                    Cell cell = entry.getValue().get(0);
+                    cell.trySetValue(entry.getKey());
+                    if (cell.getValue() != null) {
+                        filledCells.add(cell);
+                    }
+                });
     }
 
     private void tryFillEmptyConnectedCells(Cell cell, List<Cell> filledCells) {
