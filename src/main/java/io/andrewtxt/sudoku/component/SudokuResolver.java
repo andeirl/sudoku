@@ -44,7 +44,13 @@ public class SudokuResolver {
         Collections.shuffle(prevFilledCells);
         prevFilledCells.forEach(cell -> tryFillEmptyConnectedCells(cell, nextFilledCells));
         if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
-            removeSameVariants(table, nextFilledCells);
+            removeSameVariants(table, nextFilledCells, Cell::isFromThisRow);
+        }
+        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+            removeSameVariants(table, nextFilledCells, Cell::isFromThisColumn);
+        }
+        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+            removeSameVariants(table, nextFilledCells, Cell::isFromThisSubTable);
         }
         if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
             removeExclusiveVariants(table, nextFilledCells, Cell::isFromThisRow);
@@ -62,19 +68,17 @@ public class SudokuResolver {
         tryFillCells(nextFilledCells, allFilledCells, table);
     }
 
-    private void removeSameVariants(Table table, List<Cell> filledCells) {
+    private void removeSameVariants(Table table, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
         List<Cell> cells = table.getCellStream()
                 .filter(cell -> cell.getValue() == null || cell.getValue().equals(0))
                 .collect(Collectors.toList());
-        cells.forEach(cell -> removeSameVariants(cell, filledCells));
+        cells.forEach(cell -> removeSameVariants(cell, filledCells, condition));
     }
 
-    private void removeSameVariants(Cell cell, List<Cell> filledCells) {
+    private void removeSameVariants(Cell cell, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
         List<Cell> cells = cell.getActualEmptyConnectedCells().collect(Collectors.toList());
         cells.add(cell);
-        tryFillSameVariantsConnectedCells(cells.stream().filter((Cell c) -> c.isFromThisRow(cell)), filledCells);
-        tryFillSameVariantsConnectedCells(cells.stream().filter((Cell c) -> c.isFromThisColumn(cell)), filledCells);
-        tryFillSameVariantsConnectedCells(cells.stream().filter((Cell c) -> c.isFromThisSubTable(cell)), filledCells);
+        tryFillSameVariantsConnectedCells(cells.stream().filter(c -> condition.test(c, cell)), filledCells);
     }
 
     private void tryFillSameVariantsConnectedCells(Stream<Cell> cellStream, List<Cell> filledCells) {
