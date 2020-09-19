@@ -20,7 +20,7 @@ public class SudokuResolver {
         ZonedDateTime startTime = ZonedDateTime.now();
 
         Table table = new Table(values);
-        List<Cell> filledCells = getFilledCells(table);
+        List<Cell> filledCells = table.getFilledCellStream().collect(Collectors.toList());
         tryFillCells(filledCells, filledCells, table);
 
         boolean solved = filledCells.size() == CELLS_NUMBER;
@@ -31,18 +31,6 @@ public class SudokuResolver {
         System.out.println(table);
 
         return table;
-    }
-
-    private List<Cell> getFilledCells(Table table) {
-        return table.getCellStream()
-                .filter(cell -> cell.getValue() != null)
-                .collect(Collectors.toList());
-    }
-
-    private List<Cell> getEmptyCells(Table table) {
-        return table.getCellStream()
-                .filter(cell -> cell.getValue() == null)
-                .collect(Collectors.toList());
     }
 
     private Map<Integer, List<Cell>> getCellsByVariant(Stream<Cell> cellStream) {
@@ -95,7 +83,7 @@ public class SudokuResolver {
     }
 
     private void removeSameVariants(Table table, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
-        List<Cell> cells = getEmptyCells(table);
+        Stream<Cell> cells = table.getEmptyCellStream();
         cells.forEach(cell -> removeSameVariants(cell, filledCells, condition));
     }
 
@@ -128,7 +116,7 @@ public class SudokuResolver {
     }
 
     private void removeExclusiveVariants(Table table, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
-        List<Cell> cells = getEmptyCells(table);
+        Stream<Cell> cells = table.getEmptyCellStream();
         cells.forEach(cell -> removeExclusiveVariants(cell, filledCells, condition));
     }
 
@@ -154,7 +142,7 @@ public class SudokuResolver {
 
     private void removeGroupedVariants(Table table, List<Cell> filledCells,
                                        BiPredicate<Cell, Cell> condition, BiPredicate<Cell, Cell> groupCondition) {
-        List<Cell> cells = getEmptyCells(table);
+        Stream<Cell> cells = table.getEmptyCellStream();
         cells.forEach(cell -> removeGroupedVariants(cell, filledCells, condition, groupCondition));
     }
 

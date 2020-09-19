@@ -20,10 +20,16 @@ public class Table {
         return cells.stream().flatMap(Collection::stream);
     }
 
+    public Stream<Cell> getFilledCellStream() {
+        return getCellStream().filter(cell -> cell.getValue() != null);
+    }
+
+    public Stream<Cell> getEmptyCellStream() {
+        return getCellStream().filter(cell -> cell.getValue() == null);
+    }
+
     public boolean hasEmptyCells() {
-        return getCellStream()
-                .map(Cell::getValue)
-                .anyMatch((Integer value) -> value == null || value.equals(0));
+        return getEmptyCellStream().count() > 0;
     }
 
     public boolean hasCollisions() {
