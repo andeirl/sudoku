@@ -104,14 +104,15 @@ public class SudokuResolver {
                     cell.getRemainingVariants().size() < Table.ROW_NUMBER) {
                 cells.stream()
                         .filter(c -> !sameVariantsConnectedCells.contains(c))
-                        .forEach(c -> {
-                            c.tryExcludeVariantsAndSetValue(cell.getRemainingVariants());
-                            if (c.getValue() != null) {
-                                filledCells.add(c);
-                            }
-                        });
+                        .filter(c -> tryFillSameVariantsConnectedCell(c, cell.getRemainingVariants()))
+                        .forEach(filledCells::add);
             }
         }
+    }
+
+    private boolean tryFillSameVariantsConnectedCell(Cell cell, List<Integer> variantsToExclude) {
+        cell.tryExcludeVariantsAndSetValue(variantsToExclude);
+        return cell.getValue() != null;
     }
 
     private void removeExclusiveVariants(Table table, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
@@ -129,13 +130,14 @@ public class SudokuResolver {
         cells.entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().size() == 1)
-                .forEach(entry -> {
-                    Cell cell = entry.getValue().get(0);
-                    cell.trySetValue(entry.getKey());
-                    if (cell.getValue() != null) {
-                        filledCells.add(cell);
-                    }
-                });
+                .filter(entry -> tryFillExclusiveVariantsConnectedCell(entry.getValue().get(0), entry.getKey()))
+                .map(entry -> entry.getValue().get(0))
+                .forEach(filledCells::add);
+    }
+
+    private boolean tryFillExclusiveVariantsConnectedCell(Cell cell, Integer value) {
+        cell.trySetValue(value);
+        return cell.getValue() != null;
     }
 
     private void removeGroupedVariants(Table table, List<Cell> filledCells,
@@ -161,16 +163,16 @@ public class SudokuResolver {
                 .filter(entry -> entry.getValue().stream().allMatch(c -> groupCondition.test(c, cell)))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
-        List<Cell> groupedCells = cell.getActualEmptyConnectedCells()
+        cell.getActualEmptyConnectedCells()
                 .filter(c -> !condition.test(c, cell))
                 .filter(c -> groupCondition.test(c, cell))
-                .collect(Collectors.toList());
-        groupedCells.forEach(c -> {
-            c.tryExcludeVariantsAndSetValue(variants);
-            if (c.getValue() != null) {
-                filledCells.add(c);
-            }
-        });
+                .filter(c -> tryFillGroupedVariantsConnectedCell(c, variants))
+                .forEach(filledCells::add);
+    }
+
+    private boolean tryFillGroupedVariantsConnectedCell(Cell cell, List<Integer> variantsToExclude) {
+        cell.tryExcludeVariantsAndSetValue(variantsToExclude);
+        return cell.getValue() != null;
     }
 
     private void tryFillEmptyConnectedCells(Cell cell, List<Cell> filledCells) {
