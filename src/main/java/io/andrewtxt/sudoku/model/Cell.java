@@ -51,6 +51,10 @@ public class Cell {
                 .filter(cell -> cell.getValue() == null);
     }
 
+    public Stream<Cell> getActualEmptyConnectedCellsAndThis() {
+        return Stream.concat(getActualEmptyConnectedCells(), Stream.of(this));
+    }
+
     public Stream<Cell> getConnectedCells() {
         return parentTable.getCellStream()
                 .filter(this::isConnected);

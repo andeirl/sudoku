@@ -88,9 +88,8 @@ public class SudokuResolver {
     }
 
     private void removeSameVariants(Cell cell, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
-        List<Cell> cells = cell.getActualEmptyConnectedCells().collect(Collectors.toList());
-        cells.add(cell);
-        tryFillSameVariantsConnectedCells(cells.stream().filter(c -> condition.test(c, cell)), filledCells);
+        Stream<Cell> cells = cell.getActualEmptyConnectedCellsAndThis();
+        tryFillSameVariantsConnectedCells(cells.filter(c -> condition.test(c, cell)), filledCells);
     }
 
     private void tryFillSameVariantsConnectedCells(Stream<Cell> cellStream, List<Cell> filledCells) {
@@ -121,9 +120,8 @@ public class SudokuResolver {
     }
 
     private void removeExclusiveVariants(Cell cell, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
-        List<Cell> cells = cell.getActualEmptyConnectedCells().collect(Collectors.toList());
-        cells.add(cell);
-        tryFillExclusiveVariantsConnectedCells(cells.stream().filter(c -> condition.test(c, cell)), filledCells);
+        Stream<Cell> cells = cell.getActualEmptyConnectedCellsAndThis();
+        tryFillExclusiveVariantsConnectedCells(cells.filter(c -> condition.test(c, cell)), filledCells);
     }
 
     private void tryFillExclusiveVariantsConnectedCells(Stream<Cell> cellStream, List<Cell> filledCells) {
@@ -148,9 +146,8 @@ public class SudokuResolver {
 
     private void removeGroupedVariants(Cell cell, List<Cell> filledCells,
                                        BiPredicate<Cell, Cell> condition, BiPredicate<Cell, Cell> groupCondition) {
-        List<Cell> cells = cell.getActualEmptyConnectedCells().collect(Collectors.toList());
-        cells.add(cell);
-        tryFillGroupedVariantsConnectedCells(cell, cells.stream().filter(c ->
+        Stream<Cell> cells = cell.getActualEmptyConnectedCellsAndThis();
+        tryFillGroupedVariantsConnectedCells(cell, cells.filter(c ->
                 condition.test(c, cell)), filledCells, condition, groupCondition);
     }
 
