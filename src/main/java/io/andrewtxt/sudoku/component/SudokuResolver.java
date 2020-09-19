@@ -39,6 +39,20 @@ public class SudokuResolver {
                 .collect(Collectors.toList());
     }
 
+    private List<Cell> getEmptyCells(Table table) {
+        return table.getCellStream()
+                .filter(cell -> cell.getValue() == null)
+                .collect(Collectors.toList());
+    }
+
+    private Map<Integer, List<Cell>> getCellsByVariant(Stream<Cell> cellStream) {
+        Map<Integer, List<Cell>> cells = new TreeMap<>();
+        cellStream.forEach(cell ->
+                cell.getRemainingVariants().forEach(variant ->
+                        cells.computeIfAbsent(variant, v -> new ArrayList<>()).add(cell)));
+        return cells;
+    }
+
     private void tryFillCells(List<Cell> prevFilledCells, List<Cell> allFilledCells, Table table) {
         List<Cell> nextFilledCells = new ArrayList<>();
         Collections.shuffle(prevFilledCells);
@@ -69,9 +83,7 @@ public class SudokuResolver {
     }
 
     private void removeSameVariants(Table table, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
-        List<Cell> cells = table.getCellStream()
-                .filter(cell -> cell.getValue() == null || cell.getValue().equals(0))
-                .collect(Collectors.toList());
+        List<Cell> cells = getEmptyCells(table);
         cells.forEach(cell -> removeSameVariants(cell, filledCells, condition));
     }
 
@@ -84,15 +96,15 @@ public class SudokuResolver {
     private void tryFillSameVariantsConnectedCells(Stream<Cell> cellStream, List<Cell> filledCells) {
         List<Cell> cells = cellStream.collect(Collectors.toList());
         for (Cell cell : cells) {
-            List<Cell> implicitlyConnectedCells = cells
+            List<Cell> sameVariantsConnectedCells = cells
                     .stream()
                     .filter(c -> c.getRemainingVariants().size() == cell.getRemainingVariants().size())
                     .filter(c -> c.getRemainingVariants().containsAll(cell.getRemainingVariants()))
                     .collect(Collectors.toList());
-            if (implicitlyConnectedCells.size() == cell.getRemainingVariants().size() &&
+            if (sameVariantsConnectedCells.size() == cell.getRemainingVariants().size() &&
                     cell.getRemainingVariants().size() < Table.ROW_NUMBER) {
                 cells.stream()
-                        .filter(c -> !implicitlyConnectedCells.contains(c))
+                        .filter(c -> !sameVariantsConnectedCells.contains(c))
                         .forEach(c -> {
                             c.tryExcludeVariantsAndSetValue(cell.getRemainingVariants());
                             if (c.getValue() != null) {
@@ -104,9 +116,7 @@ public class SudokuResolver {
     }
 
     private void removeExclusiveVariants(Table table, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
-        List<Cell> cells = table.getCellStream()
-                .filter(cell -> cell.getValue() == null || cell.getValue().equals(0))
-                .collect(Collectors.toList());
+        List<Cell> cells = getEmptyCells(table);
         cells.forEach(cell -> removeExclusiveVariants(cell, filledCells, condition));
     }
 
@@ -117,10 +127,7 @@ public class SudokuResolver {
     }
 
     private void tryFillExclusiveVariantsConnectedCells(Stream<Cell> cellStream, List<Cell> filledCells) {
-        Map<Integer, List<Cell>> cells = new TreeMap<>();
-        cellStream.forEach(cell ->
-                cell.getRemainingVariants().forEach(variant ->
-                        cells.computeIfAbsent(variant, v -> new ArrayList<>()).add(cell)));
+        Map<Integer, List<Cell>> cells = getCellsByVariant(cellStream);
         cells.entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().size() == 1)
