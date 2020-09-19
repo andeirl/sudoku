@@ -75,6 +75,18 @@ public class SudokuResolver {
         if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
             removeExclusiveVariants(table, nextFilledCells, Cell::isFromThisSubTable);
         }
+        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+            removeGroupedVariants(table, nextFilledCells, Cell::isFromThisRow, Cell::isFromThisSubTable);
+        }
+        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+            removeGroupedVariants(table, nextFilledCells, Cell::isFromThisColumn, Cell::isFromThisSubTable);
+        }
+        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+            removeGroupedVariants(table, nextFilledCells, Cell::isFromThisSubTable, Cell::isFromThisRow);
+        }
+        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+            removeGroupedVariants(table, nextFilledCells, Cell::isFromThisSubTable, Cell::isFromThisColumn);
+        }
         allFilledCells.addAll(nextFilledCells);
         if (nextFilledCells.isEmpty()) {
             return;
@@ -138,6 +150,42 @@ public class SudokuResolver {
                         filledCells.add(cell);
                     }
                 });
+    }
+
+    private void removeGroupedVariants(Table table, List<Cell> filledCells,
+                                       BiPredicate<Cell, Cell> condition, BiPredicate<Cell, Cell> groupCondition) {
+        List<Cell> cells = getEmptyCells(table);
+        cells.forEach(cell -> removeGroupedVariants(cell, filledCells, condition, groupCondition));
+    }
+
+    private void removeGroupedVariants(Cell cell, List<Cell> filledCells,
+                                       BiPredicate<Cell, Cell> condition, BiPredicate<Cell, Cell> groupCondition) {
+        List<Cell> cells = cell.getActualEmptyConnectedCells().collect(Collectors.toList());
+        cells.add(cell);
+        tryFillGroupedVariantsConnectedCells(cell, cells.stream().filter(c ->
+                condition.test(c, cell)), filledCells, condition, groupCondition);
+    }
+
+    private void tryFillGroupedVariantsConnectedCells(Cell cell, Stream<Cell> cellStream, List<Cell> filledCells,
+                                                      BiPredicate<Cell, Cell> condition,
+                                                      BiPredicate<Cell, Cell> groupCondition) {
+        Map<Integer, List<Cell>> cells = getCellsByVariant(cellStream);
+        List<Integer> variants = cells.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().size() > 1 && entry.getValue().size() <= Cell.SUB_TABLE_ROW_NUMBER)
+                .filter(entry -> entry.getValue().stream().allMatch(c -> groupCondition.test(c, cell)))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        List<Cell> groupedCells = cell.getActualEmptyConnectedCells()
+                .filter(c -> !condition.test(c, cell))
+                .filter(c -> groupCondition.test(c, cell))
+                .collect(Collectors.toList());
+        groupedCells.forEach(c -> {
+            c.tryExcludeVariantsAndSetValue(variants);
+            if (c.getValue() != null) {
+                filledCells.add(c);
+            }
+        });
     }
 
     private void tryFillEmptyConnectedCells(Cell cell, List<Cell> filledCells) {

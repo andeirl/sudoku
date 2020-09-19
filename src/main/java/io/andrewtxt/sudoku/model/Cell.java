@@ -7,8 +7,8 @@ import java.util.stream.Stream;
 
 public class Cell {
 
-    private static final int SUB_TABLE_ROW_NUMBER = 3;
-    private static final int SUB_TABLE_COLUMN_NUMBER = 3;
+    public static final int SUB_TABLE_ROW_NUMBER = 3;
+    public static final int SUB_TABLE_COLUMN_NUMBER = 3;
 
     private static final String VALUE_FORMAT = "         ";
 
