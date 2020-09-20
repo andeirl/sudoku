@@ -61,15 +61,12 @@ public class SudokuResolver {
     }
 
     private void processExchangeableCells(Table table, List<Cell> result) {
-        if (result.isEmpty()) {
-            table.emptyCells().forEach(cell -> processExchangeableCells(cell, result, Cell::isFromThisRow));
+        if (!result.isEmpty()) {
+            return;
         }
-        if (result.isEmpty()) {
-            table.emptyCells().forEach(cell -> processExchangeableCells(cell, result, Cell::isFromThisColumn));
-        }
-        if (result.isEmpty()) {
-            table.emptyCells().forEach(cell -> processExchangeableCells(cell, result, Cell::isFromThisSubTable));
-        }
+        table.emptyCells().forEach(cell -> processExchangeableCells(cell, result, Cell::isFromThisRow));
+        table.emptyCells().forEach(cell -> processExchangeableCells(cell, result, Cell::isFromThisColumn));
+        table.emptyCells().forEach(cell -> processExchangeableCells(cell, result, Cell::isFromThisSubTable));
     }
 
     private void processExchangeableCells(Cell cell, List<Cell> result, BiPredicate<Cell, Cell> condition) {
@@ -89,15 +86,12 @@ public class SudokuResolver {
     }
 
     private void processUniqueCells(Table table, List<Cell> result) {
-        if (result.isEmpty()) {
-            table.emptyCells().forEach(cell -> processUniqueCells(cell, result, Cell::isFromThisRow));
+        if (!result.isEmpty()) {
+            return;
         }
-        if (result.isEmpty()) {
-            table.emptyCells().forEach(cell -> processUniqueCells(cell, result, Cell::isFromThisColumn));
-        }
-        if (result.isEmpty()) {
-            table.emptyCells().forEach(cell -> processUniqueCells(cell, result, Cell::isFromThisSubTable));
-        }
+        table.emptyCells().forEach(cell -> processUniqueCells(cell, result, Cell::isFromThisRow));
+        table.emptyCells().forEach(cell -> processUniqueCells(cell, result, Cell::isFromThisColumn));
+        table.emptyCells().forEach(cell -> processUniqueCells(cell, result, Cell::isFromThisSubTable));
     }
 
     private void processUniqueCells(Cell cell, List<Cell> result, BiPredicate<Cell, Cell> condition) {
@@ -107,28 +101,24 @@ public class SudokuResolver {
                 .entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().size() == 1)
+                .filter(entry -> result.stream().noneMatch(c -> c.getValue().equals(entry.getKey())))
                 .filter(entry -> entry.getValue().get(0).trySetValue(entry.getKey()))
                 .map(entry -> entry.getValue().get(0))
                 .forEach(result::add);
     }
 
     private void processIntersectionCells(Table table, List<Cell> result) {
-        if (result.isEmpty()) {
-            table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
-                    Cell::isFromThisRow, Cell::isFromThisSubTable));
+        if (!result.isEmpty()) {
+            return;
         }
-        if (result.isEmpty()) {
-            table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
-                    Cell::isFromThisColumn, Cell::isFromThisSubTable));
-        }
-        if (result.isEmpty()) {
-            table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
-                    Cell::isFromThisSubTable, Cell::isFromThisRow));
-        }
-        if (result.isEmpty()) {
-            table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
-                    Cell::isFromThisSubTable, Cell::isFromThisColumn));
-        }
+        table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
+                Cell::isFromThisRow, Cell::isFromThisSubTable));
+        table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
+                Cell::isFromThisColumn, Cell::isFromThisSubTable));
+        table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
+                Cell::isFromThisSubTable, Cell::isFromThisRow));
+        table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
+                Cell::isFromThisSubTable, Cell::isFromThisColumn));
     }
 
     private void processIntersectionCells(Cell cell, List<Cell> result,
