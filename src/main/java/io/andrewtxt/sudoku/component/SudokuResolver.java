@@ -103,15 +103,10 @@ public class SudokuResolver {
                     cell.getRemainingVariants().size() < Table.ROW_NUMBER) {
                 cells.stream()
                         .filter(c -> !sameVariantsConnectedCells.contains(c))
-                        .filter(c -> tryFillSameVariantsConnectedCell(c, cell.getRemainingVariants()))
+                        .filter(c -> c.tryExcludeVariantsAndSetValue(cell.getRemainingVariants()))
                         .forEach(filledCells::add);
             }
         }
-    }
-
-    private boolean tryFillSameVariantsConnectedCell(Cell cell, List<Integer> variantsToExclude) {
-        cell.tryExcludeVariantsAndSetValue(variantsToExclude);
-        return cell.getValue() != null;
     }
 
     private void removeExclusiveVariants(Table table, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
@@ -129,14 +124,9 @@ public class SudokuResolver {
         cells.entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().size() == 1)
-                .filter(entry -> tryFillExclusiveVariantsConnectedCell(entry.getValue().get(0), entry.getKey()))
+                .filter(entry -> entry.getValue().get(0).trySetValue(entry.getKey()))
                 .map(entry -> entry.getValue().get(0))
                 .forEach(filledCells::add);
-    }
-
-    private boolean tryFillExclusiveVariantsConnectedCell(Cell cell, Integer value) {
-        cell.trySetValue(value);
-        return cell.getValue() != null;
     }
 
     private void removeGroupedVariants(Table table, List<Cell> filledCells,
@@ -165,24 +155,14 @@ public class SudokuResolver {
         cell.getActualEmptyConnectedCells()
                 .filter(c -> !condition.test(c, cell))
                 .filter(c -> groupCondition.test(c, cell))
-                .filter(c -> tryFillGroupedVariantsConnectedCell(c, variants))
+                .filter(c -> c.tryExcludeVariantsAndSetValue(variants))
                 .forEach(filledCells::add);
-    }
-
-    private boolean tryFillGroupedVariantsConnectedCell(Cell cell, List<Integer> variantsToExclude) {
-        cell.tryExcludeVariantsAndSetValue(variantsToExclude);
-        return cell.getValue() != null;
     }
 
     private void tryFillEmptyConnectedCells(Cell cell, List<Cell> filledCells) {
         cell.getActualEmptyConnectedCells()
-                .filter(connectedCell -> tryFillEmptyConnectedCell(connectedCell, cell.getValue()))
+                .filter(connectedCell -> connectedCell.tryExcludeVariantAndSetValue(cell.getValue()))
                 .forEach(filledCells::add);
-    }
-
-    private boolean tryFillEmptyConnectedCell(Cell cell, Integer variantToExclude) {
-        cell.tryExcludeVariantAndSetValue(variantToExclude);
-        return cell.getValue() != null;
     }
 
 }

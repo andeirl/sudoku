@@ -60,22 +60,25 @@ public class Cell {
                 .filter(this::isConnected);
     }
 
-    public void tryExcludeVariantAndSetValue(Integer variantToExclude) {
+    public boolean tryExcludeVariantAndSetValue(Integer variantToExclude) {
         remainingVariants.remove(variantToExclude);
         if (remainingVariants.size() == 1) {
             value = remainingVariants.remove(0);
         }
+        return value != null;
     }
 
-    public void tryExcludeVariantsAndSetValue(List<Integer> variantsToExclude) {
+    public boolean tryExcludeVariantsAndSetValue(List<Integer> variantsToExclude) {
         variantsToExclude.forEach(this::tryExcludeVariantAndSetValue);
+        return value != null;
     }
 
-    public void trySetValue(Integer value) {
+    public boolean trySetValue(Integer value) {
         if (remainingVariants.contains(value)) {
             this.value = value;
             remainingVariants.clear();
         }
+        return value != null;
     }
 
     @Override
