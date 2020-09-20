@@ -20,7 +20,7 @@ public class SudokuResolver {
         ZonedDateTime startTime = ZonedDateTime.now();
 
         Table table = new Table(values);
-        List<Cell> filledCells = table.getFilledCellStream().collect(Collectors.toList());
+        Set<Cell> filledCells = table.getFilledCellStream().collect(Collectors.toSet());
         tryFillCells(filledCells, filledCells, table);
 
         boolean solved = filledCells.size() == CELLS_NUMBER;
@@ -41,9 +41,8 @@ public class SudokuResolver {
         return cells;
     }
 
-    private void tryFillCells(List<Cell> prevFilledCells, List<Cell> allFilledCells, Table table) {
+    private void tryFillCells(Collection<Cell> prevFilledCells, Collection<Cell> allFilledCells, Table table) {
         List<Cell> nextFilledCells = new ArrayList<>();
-        Collections.shuffle(prevFilledCells);
         prevFilledCells.forEach(cell -> tryFillEmptyConnectedCells(cell, nextFilledCells));
         if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
             removeSameVariants(table, nextFilledCells, Cell::isFromThisRow);
