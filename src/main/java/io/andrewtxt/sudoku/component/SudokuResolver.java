@@ -20,7 +20,7 @@ public class SudokuResolver {
         ZonedDateTime startTime = ZonedDateTime.now();
 
         Table table = new Table(values);
-        Set<Cell> filledCells = table.getFilledCellStream().collect(Collectors.toSet());
+        Set<Cell> filledCells = table.filledCells().collect(Collectors.toSet());
         processCells(filledCells, filledCells, table);
 
         boolean solved = filledCells.size() == CELLS_NUMBER;
@@ -46,54 +46,54 @@ public class SudokuResolver {
         processCells(nextFilledCells, allFilledCells, table);
     }
 
-    private void processConnectedCells(Cell cell, List<Cell> filledCells) {
-        cell.getActualEmptyConnectedCells()
+    private void processConnectedCells(Cell cell, List<Cell> result) {
+        cell.actualEmptyConnectedCells()
                 .filter(connectedCell -> connectedCell.tryExcludeVariantAndSetValue(cell.getValue()))
-                .forEach(filledCells::add);
+                .forEach(result::add);
     }
 
-    private void processExchangeableCells(Table table, List<Cell> filledCells) {
-        if (filledCells.isEmpty()) {
-            table.getEmptyCellStream().forEach(cell -> processExchangeableCells(cell, filledCells, Cell::isFromThisRow));
+    private void processExchangeableCells(Table table, List<Cell> result) {
+        if (result.isEmpty()) {
+            table.emptyCells().forEach(cell -> processExchangeableCells(cell, result, Cell::isFromThisRow));
         }
-        if (filledCells.isEmpty()) {
-            table.getEmptyCellStream().forEach(cell -> processExchangeableCells(cell, filledCells, Cell::isFromThisColumn));
+        if (result.isEmpty()) {
+            table.emptyCells().forEach(cell -> processExchangeableCells(cell, result, Cell::isFromThisColumn));
         }
-        if (filledCells.isEmpty()) {
-            table.getEmptyCellStream().forEach(cell -> processExchangeableCells(cell, filledCells, Cell::isFromThisSubTable));
+        if (result.isEmpty()) {
+            table.emptyCells().forEach(cell -> processExchangeableCells(cell, result, Cell::isFromThisSubTable));
         }
     }
 
-    private void processExchangeableCells(Cell cell, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
-        Stream<Cell> emptyCells = cell.getActualEmptyConnectedCellsAndThis();
+    private void processExchangeableCells(Cell cell, List<Cell> result, BiPredicate<Cell, Cell> condition) {
+        Stream<Cell> emptyCells = cell.actualEmptyConnectedCellsAndThis();
         List<Cell> cells = emptyCells.filter(c -> condition.test(c, cell)).collect(Collectors.toList());
-        getCellsByVariants(cells.stream())
+        cellsByVariants(cells.stream())
                 .filter(list -> list.size() > 1)
                 .filter(list -> list.get(0).getRemainingVariants().size() == list.size())
-                .forEach(list -> processExchangeableCells(list, cells, filledCells));
+                .forEach(list -> processExchangeableCells(list, cells, result));
     }
 
-    private void processExchangeableCells(List<Cell> exchangeableCells, List<Cell> cells, List<Cell> filledCells) {
+    private void processExchangeableCells(List<Cell> exchangeableCells, List<Cell> cells, List<Cell> result) {
         cells.stream()
                 .filter(cell -> !exchangeableCells.contains(cell))
                 .filter(cell -> cell.tryExcludeVariantsAndSetValue(exchangeableCells.get(0).getRemainingVariants()))
-                .forEach(filledCells::add);
+                .forEach(result::add);
     }
 
-    private void processUniqueCells(Table table, List<Cell> filledCells) {
-        if (filledCells.isEmpty()) {
-            table.getEmptyCellStream().forEach(cell -> processUniqueCells(cell, filledCells, Cell::isFromThisRow));
+    private void processUniqueCells(Table table, List<Cell> result) {
+        if (result.isEmpty()) {
+            table.emptyCells().forEach(cell -> processUniqueCells(cell, result, Cell::isFromThisRow));
         }
-        if (filledCells.isEmpty()) {
-            table.getEmptyCellStream().forEach(cell -> processUniqueCells(cell, filledCells, Cell::isFromThisColumn));
+        if (result.isEmpty()) {
+            table.emptyCells().forEach(cell -> processUniqueCells(cell, result, Cell::isFromThisColumn));
         }
-        if (filledCells.isEmpty()) {
-            table.getEmptyCellStream().forEach(cell -> processUniqueCells(cell, filledCells, Cell::isFromThisSubTable));
+        if (result.isEmpty()) {
+            table.emptyCells().forEach(cell -> processUniqueCells(cell, result, Cell::isFromThisSubTable));
         }
     }
 
-    private void processUniqueCells(Cell cell, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
-        Stream<Cell> emptyCells = cell.getActualEmptyConnectedCellsAndThis();
+    private void processUniqueCells(Cell cell, List<Cell> result, BiPredicate<Cell, Cell> condition) {
+        Stream<Cell> emptyCells = cell.actualEmptyConnectedCellsAndThis();
         List<Cell> cells = emptyCells.filter(c -> condition.test(c, cell)).collect(Collectors.toList());
         getCellsByVariant(cells.stream())
                 .entrySet()
@@ -101,31 +101,31 @@ public class SudokuResolver {
                 .filter(entry -> entry.getValue().size() == 1)
                 .filter(entry -> entry.getValue().get(0).trySetValue(entry.getKey()))
                 .map(entry -> entry.getValue().get(0))
-                .forEach(filledCells::add);
+                .forEach(result::add);
     }
 
-    private void processIntersectionCells(Table table, List<Cell> filledCells) {
-        if (filledCells.isEmpty()) {
-            table.getEmptyCellStream().forEach(cell -> processIntersectionCells(cell, filledCells,
+    private void processIntersectionCells(Table table, List<Cell> result) {
+        if (result.isEmpty()) {
+            table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
                     Cell::isFromThisRow, Cell::isFromThisSubTable));
         }
-        if (filledCells.isEmpty()) {
-            table.getEmptyCellStream().forEach(cell -> processIntersectionCells(cell, filledCells,
+        if (result.isEmpty()) {
+            table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
                     Cell::isFromThisColumn, Cell::isFromThisSubTable));
         }
-        if (filledCells.isEmpty()) {
-            table.getEmptyCellStream().forEach(cell -> processIntersectionCells(cell, filledCells,
+        if (result.isEmpty()) {
+            table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
                     Cell::isFromThisSubTable, Cell::isFromThisRow));
         }
-        if (filledCells.isEmpty()) {
-            table.getEmptyCellStream().forEach(cell -> processIntersectionCells(cell, filledCells,
+        if (result.isEmpty()) {
+            table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
                     Cell::isFromThisSubTable, Cell::isFromThisColumn));
         }
     }
 
-    private void processIntersectionCells(Cell cell, List<Cell> filledCells,
+    private void processIntersectionCells(Cell cell, List<Cell> result,
                                           BiPredicate<Cell, Cell> condition, BiPredicate<Cell, Cell> groupCondition) {
-        Stream<Cell> emptyCells = cell.getActualEmptyConnectedCellsAndThis();
+        Stream<Cell> emptyCells = cell.actualEmptyConnectedCellsAndThis();
         List<Cell> cells = emptyCells.filter(c -> condition.test(c, cell)).collect(Collectors.toList());
         List<Cell> groupCells = emptyCells.filter(c -> groupCondition.test(c, cell)).collect(Collectors.toList());
         getCellsByVariant(cells.stream())
@@ -133,27 +133,26 @@ public class SudokuResolver {
                 .stream()
                 .filter(entry -> entry.getValue().size() > 1 && entry.getValue().size() <= Cell.SUB_TABLE_ROW_NUMBER)
                 .filter(entry -> entry.getValue().stream().allMatch(c -> groupCondition.test(c, cell)))
-                .forEach(entry -> processIntersectionCells(entry.getValue(), groupCells, filledCells, entry.getKey()));
+                .forEach(entry -> processIntersectionCells(entry.getValue(), groupCells, result, entry.getKey()));
     }
 
-    private void processIntersectionCells(List<Cell> intersectionCells, List<Cell> groupCells, List<Cell> filledCells,
+    private void processIntersectionCells(List<Cell> intersectionCells, List<Cell> groupCells, List<Cell> result,
                                           Integer variant) {
         groupCells.stream()
                 .filter(cell -> !intersectionCells.contains(cell))
                 .filter(c -> c.tryExcludeVariantAndSetValue(variant))
-                .forEach(filledCells::add);
+                .forEach(result::add);
     }
 
-    private Map<Integer, List<Cell>> getCellsByVariant(Stream<Cell> cellStream) {
-        Map<Integer, List<Cell>> cells = new TreeMap<>();
-        cellStream.forEach(cell ->
-                cell.getRemainingVariants().forEach(variant ->
-                        cells.computeIfAbsent(variant, v -> new ArrayList<>()).add(cell)));
-        return cells;
+    private Map<Integer, List<Cell>> getCellsByVariant(Stream<Cell> cells) {
+        Map<Integer, List<Cell>> cellMap = new TreeMap<>();
+        cells.forEach(cell -> cell.getRemainingVariants().forEach(variant ->
+                cellMap.computeIfAbsent(variant, v -> new ArrayList<>()).add(cell)));
+        return cellMap;
     }
 
-    private Stream<List<Cell>> getCellsByVariants(Stream<Cell> cellStream) {
-        return cellStream
+    private Stream<List<Cell>> cellsByVariants(Stream<Cell> cells) {
+        return cells
                 .collect(Collectors.groupingBy(Cell::getVariantsAsKey))
                 .values()
                 .stream();

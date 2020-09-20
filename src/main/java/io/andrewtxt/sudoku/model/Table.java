@@ -16,25 +16,24 @@ public class Table {
         connectCells();
     }
 
-    public Stream<Cell> getCellStream() {
+    public Stream<Cell> cells() {
         return cells.stream().flatMap(Collection::stream);
     }
 
-    public Stream<Cell> getFilledCellStream() {
-        return getCellStream().filter(cell -> cell.getValue() != null);
+    public Stream<Cell> filledCells() {
+        return cells().filter(cell -> cell.getValue() != null);
     }
 
-    public Stream<Cell> getEmptyCellStream() {
-        return getCellStream().filter(cell -> cell.getValue() == null);
+    public Stream<Cell> emptyCells() {
+        return cells().filter(cell -> cell.getValue() == null);
     }
 
     public boolean hasEmptyCells() {
-        return getEmptyCellStream().count() > 0;
+        return emptyCells().count() > 0;
     }
 
     public boolean hasCollisions() {
-        return getCellStream()
-                .anyMatch((Cell cell) -> hasValue(cell.getConnectedCells(), cell.getValue()));
+        return cells().anyMatch((Cell cell) -> hasValue(cell.connectedCells(), cell.getValue()));
     }
 
     @Override
@@ -62,16 +61,11 @@ public class Table {
     }
 
     private void connectCells() {
-        cells.stream()
-                .flatMap(Collection::stream)
-                .forEach(Cell::initEmptyConnectedCells);
+        cells.stream().flatMap(Collection::stream).forEach(Cell::initEmptyConnectedCells);
     }
 
-    private boolean hasValue(Stream<Cell> cellStream, Integer value) {
-        return cellStream
-                .map(Cell::getValue)
-                .filter(Objects::nonNull)
-                .anyMatch(cellValue -> cellValue.equals(value));
+    private boolean hasValue(Stream<Cell> cells, Integer value) {
+        return cells.map(Cell::getValue).filter(Objects::nonNull).anyMatch(cellValue -> cellValue.equals(value));
     }
 
 }

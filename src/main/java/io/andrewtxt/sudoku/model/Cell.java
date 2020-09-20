@@ -45,19 +45,16 @@ public class Cell {
         return remainingVariants;
     }
 
-    public Stream<Cell> getActualEmptyConnectedCells() {
-        return initialEmptyConnectedCells
-                .stream()
-                .filter(cell -> cell.getValue() == null);
+    public Stream<Cell> actualEmptyConnectedCells() {
+        return initialEmptyConnectedCells.stream().filter(cell -> cell.getValue() == null);
     }
 
-    public Stream<Cell> getActualEmptyConnectedCellsAndThis() {
-        return Stream.concat(getActualEmptyConnectedCells(), Stream.of(this));
+    public Stream<Cell> actualEmptyConnectedCellsAndThis() {
+        return Stream.concat(actualEmptyConnectedCells(), Stream.of(this));
     }
 
-    public Stream<Cell> getConnectedCells() {
-        return parentTable.getCellStream()
-                .filter(this::isConnected);
+    public Stream<Cell> connectedCells() {
+        return parentTable.cells().filter(this::isConnected);
     }
 
     public String getVariantsAsKey() {
@@ -115,7 +112,7 @@ public class Cell {
     }
 
     void initEmptyConnectedCells() {
-        this.initialEmptyConnectedCells = getConnectedCells().collect(Collectors.toList());
+        this.initialEmptyConnectedCells = connectedCells().collect(Collectors.toList());
     }
 
     private boolean isConnected(Cell cell) {
