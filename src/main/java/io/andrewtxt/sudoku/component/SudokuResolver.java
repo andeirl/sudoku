@@ -118,32 +118,29 @@ public class SudokuResolver {
     }
 
     private void processIntersectionCells(Table table, List<Cell> filledCells,
-                                       BiPredicate<Cell, Cell> condition, BiPredicate<Cell, Cell> groupCondition) {
+                                          BiPredicate<Cell, Cell> condition, BiPredicate<Cell, Cell> groupCondition) {
         Stream<Cell> cells = table.getEmptyCellStream();
         cells.forEach(cell -> processIntersectionCells(cell, filledCells, condition, groupCondition));
     }
 
     private void processIntersectionCells(Cell cell, List<Cell> filledCells,
-                                       BiPredicate<Cell, Cell> condition, BiPredicate<Cell, Cell> groupCondition) {
-        Stream<Cell> cells = cell.getActualEmptyConnectedCellsAndThis();
-        processIntersectionCells(cell, cells.filter(c ->
-                condition.test(c, cell)), filledCells, condition, groupCondition);
-    }
-
-    private void processIntersectionCells(Cell cell, Stream<Cell> cellStream, List<Cell> filledCells,
-                                                      BiPredicate<Cell, Cell> condition,
-                                                      BiPredicate<Cell, Cell> groupCondition) {
-        Map<Integer, List<Cell>> cells = getCellsByVariant(cellStream);
-        List<Integer> variants = cells.entrySet()
+                                          BiPredicate<Cell, Cell> condition, BiPredicate<Cell, Cell> groupCondition) {
+        Stream<Cell> emptyCells = cell.getActualEmptyConnectedCellsAndThis();
+        List<Cell> cells = emptyCells.filter(c -> condition.test(c, cell)).collect(Collectors.toList());
+        List<Cell> groupCells = emptyCells.filter(c -> groupCondition.test(c, cell)).collect(Collectors.toList());
+        getCellsByVariant(cells.stream())
+                .entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().size() > 1 && entry.getValue().size() <= Cell.SUB_TABLE_ROW_NUMBER)
                 .filter(entry -> entry.getValue().stream().allMatch(c -> groupCondition.test(c, cell)))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
-        cell.getActualEmptyConnectedCells()
-                .filter(c -> !condition.test(c, cell))
-                .filter(c -> groupCondition.test(c, cell))
-                .filter(c -> c.tryExcludeVariantsAndSetValue(variants))
+                .forEach(entry -> processIntersectionCells(entry.getValue(), groupCells, filledCells, entry.getKey()));
+    }
+
+    private void processIntersectionCells(List<Cell> intersectionCells, List<Cell> groupCells, List<Cell> filledCells,
+                                          Integer variant) {
+        groupCells.stream()
+                .filter(cell -> !intersectionCells.contains(cell))
+                .filter(c -> c.tryExcludeVariantAndSetValue(variant))
                 .forEach(filledCells::add);
     }
 
