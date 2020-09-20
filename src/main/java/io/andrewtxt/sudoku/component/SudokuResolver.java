@@ -35,15 +35,23 @@ public class SudokuResolver {
 
     private void processCells(Collection<Cell> prevFilledCells, Collection<Cell> allFilledCells, Table table) {
         List<Cell> nextFilledCells = new ArrayList<>();
-        prevFilledCells.forEach(cell -> processConnectedCells(cell, nextFilledCells));
-        processExchangeableCells(table, nextFilledCells);
-        processUniqueCells(table, nextFilledCells);
-        processIntersectionCells(table, nextFilledCells);
+        mainSteps(prevFilledCells, nextFilledCells);
+        additionalSteps(table, nextFilledCells);
         allFilledCells.addAll(nextFilledCells);
         if (nextFilledCells.isEmpty() || allFilledCells.size() == CELLS_NUMBER) {
             return;
         }
         processCells(nextFilledCells, allFilledCells, table);
+    }
+
+    private void mainSteps(Collection<Cell> prevFilledCells, List<Cell> nextFilledCells) {
+        prevFilledCells.forEach(cell -> processConnectedCells(cell, nextFilledCells));
+    }
+
+    private void additionalSteps(Table table, List<Cell> nextFilledCells) {
+        processExchangeableCells(table, nextFilledCells);
+        processUniqueCells(table, nextFilledCells);
+        processIntersectionCells(table, nextFilledCells);
     }
 
     private void processConnectedCells(Cell cell, List<Cell> result) {
@@ -152,10 +160,7 @@ public class SudokuResolver {
     }
 
     private Stream<List<Cell>> cellsByVariants(Stream<Cell> cells) {
-        return cells
-                .collect(Collectors.groupingBy(Cell::getVariantsAsKey))
-                .values()
-                .stream();
+        return cells.collect(Collectors.groupingBy(Cell::getVariantsAsKey)).values().stream();
     }
 
 }
