@@ -85,26 +85,19 @@ public class SudokuResolver {
     }
 
     private void processExchangeableCells(Cell cell, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
-        Stream<Cell> cells = cell.getActualEmptyConnectedCellsAndThis();
-        processExchangeableCells(cells.filter(c -> condition.test(c, cell)), filledCells);
+        Stream<Cell> emptyCells = cell.getActualEmptyConnectedCellsAndThis();
+        List<Cell> cells = emptyCells.filter(c -> condition.test(c, cell)).collect(Collectors.toList());
+        getCellsByVariants(cells.stream())
+                .filter(list -> list.size() > 1)
+                .filter(list -> list.get(0).getRemainingVariants().size() == list.size())
+                .forEach(list -> processExchangeableCells(list, cells, filledCells));
     }
 
-    private void processExchangeableCells(Stream<Cell> cellStream, List<Cell> filledCells) {
-        List<Cell> cells = cellStream.collect(Collectors.toList());
-        for (Cell cell : cells) {
-            List<Cell> sameVariantsConnectedCells = cells
-                    .stream()
-                    .filter(c -> c.getRemainingVariants().size() == cell.getRemainingVariants().size())
-                    .filter(c -> c.getRemainingVariants().containsAll(cell.getRemainingVariants()))
-                    .collect(Collectors.toList());
-            if (sameVariantsConnectedCells.size() == cell.getRemainingVariants().size() &&
-                    cell.getRemainingVariants().size() < Table.ROW_NUMBER) {
-                cells.stream()
-                        .filter(c -> !sameVariantsConnectedCells.contains(c))
-                        .filter(c -> c.tryExcludeVariantsAndSetValue(cell.getRemainingVariants()))
-                        .forEach(filledCells::add);
-            }
-        }
+    private void processExchangeableCells(List<Cell> exchangeableCells, List<Cell> cells, List<Cell> filledCells) {
+        cells.stream()
+                .filter(cell -> !exchangeableCells.contains(cell))
+                .filter(cell -> cell.tryExcludeVariantsAndSetValue(exchangeableCells.get(0).getRemainingVariants()))
+                .forEach(filledCells::add);
     }
 
     private void processUniqueCells(Table table, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
@@ -163,6 +156,13 @@ public class SudokuResolver {
                 cell.getRemainingVariants().forEach(variant ->
                         cells.computeIfAbsent(variant, v -> new ArrayList<>()).add(cell)));
         return cells;
+    }
+
+    private Stream<List<Cell>> getCellsByVariants(Stream<Cell> cellStream) {
+        return cellStream
+                .collect(Collectors.groupingBy(Cell::getVariantsAsKey))
+                .values()
+                .stream();
     }
 
 }

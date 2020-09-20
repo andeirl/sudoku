@@ -60,6 +60,13 @@ public class Cell {
                 .filter(this::isConnected);
     }
 
+    public String getVariantsAsKey() {
+        return remainingVariants
+                .stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(""));
+    }
+
     public boolean tryExcludeVariantAndSetValue(Integer variantToExclude) {
         remainingVariants.remove(variantToExclude);
         if (remainingVariants.size() == 1) {
@@ -101,10 +108,7 @@ public class Cell {
     @Override
     public String toString() {
         if (value == null) {
-            String variantsStr = remainingVariants
-                    .stream()
-                    .map(Object::toString)
-                    .collect(Collectors.joining(""));
+            String variantsStr = getVariantsAsKey();
             return " " + variantsStr + VALUE_FORMAT.substring(variantsStr.length()) + " ";
         }
         return " " + value.toString() + VALUE_FORMAT.substring(1) + " ";
