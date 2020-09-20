@@ -33,49 +33,41 @@ public class SudokuResolver {
         return table;
     }
 
-    private Map<Integer, List<Cell>> getCellsByVariant(Stream<Cell> cellStream) {
-        Map<Integer, List<Cell>> cells = new TreeMap<>();
-        cellStream.forEach(cell ->
-                cell.getRemainingVariants().forEach(variant ->
-                        cells.computeIfAbsent(variant, v -> new ArrayList<>()).add(cell)));
-        return cells;
-    }
-
     private void processCells(Collection<Cell> prevFilledCells, Collection<Cell> allFilledCells, Table table) {
         List<Cell> nextFilledCells = new ArrayList<>();
         prevFilledCells.forEach(cell -> processConnectedCells(cell, nextFilledCells));
-        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+        if (nextFilledCells.isEmpty()) {
             processExchangeableCells(table, nextFilledCells, Cell::isFromThisRow);
         }
-        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+        if (nextFilledCells.isEmpty()) {
             processExchangeableCells(table, nextFilledCells, Cell::isFromThisColumn);
         }
-        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+        if (nextFilledCells.isEmpty()) {
             processExchangeableCells(table, nextFilledCells, Cell::isFromThisSubTable);
         }
-        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+        if (nextFilledCells.isEmpty()) {
             processUniqueCells(table, nextFilledCells, Cell::isFromThisRow);
         }
-        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+        if (nextFilledCells.isEmpty()) {
             processUniqueCells(table, nextFilledCells, Cell::isFromThisColumn);
         }
-        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+        if (nextFilledCells.isEmpty()) {
             processUniqueCells(table, nextFilledCells, Cell::isFromThisSubTable);
         }
-        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+        if (nextFilledCells.isEmpty()) {
             processIntersectionCells(table, nextFilledCells, Cell::isFromThisRow, Cell::isFromThisSubTable);
         }
-        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+        if (nextFilledCells.isEmpty()) {
             processIntersectionCells(table, nextFilledCells, Cell::isFromThisColumn, Cell::isFromThisSubTable);
         }
-        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+        if (nextFilledCells.isEmpty()) {
             processIntersectionCells(table, nextFilledCells, Cell::isFromThisSubTable, Cell::isFromThisRow);
         }
-        if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
+        if (nextFilledCells.isEmpty()) {
             processIntersectionCells(table, nextFilledCells, Cell::isFromThisSubTable, Cell::isFromThisColumn);
         }
         allFilledCells.addAll(nextFilledCells);
-        if (nextFilledCells.isEmpty()) {
+        if (nextFilledCells.isEmpty() || allFilledCells.size() == CELLS_NUMBER) {
             return;
         }
         processCells(nextFilledCells, allFilledCells, table);
@@ -163,6 +155,14 @@ public class SudokuResolver {
                 .filter(c -> groupCondition.test(c, cell))
                 .filter(c -> c.tryExcludeVariantsAndSetValue(variants))
                 .forEach(filledCells::add);
+    }
+
+    private Map<Integer, List<Cell>> getCellsByVariant(Stream<Cell> cellStream) {
+        Map<Integer, List<Cell>> cells = new TreeMap<>();
+        cellStream.forEach(cell ->
+                cell.getRemainingVariants().forEach(variant ->
+                        cells.computeIfAbsent(variant, v -> new ArrayList<>()).add(cell)));
+        return cells;
     }
 
 }
