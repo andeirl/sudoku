@@ -21,7 +21,7 @@ public class SudokuResolver {
 
         Table table = new Table(values);
         Set<Cell> filledCells = table.getFilledCellStream().collect(Collectors.toSet());
-        tryFillCells(filledCells, filledCells, table);
+        processCells(filledCells, filledCells, table);
 
         boolean solved = filledCells.size() == CELLS_NUMBER;
         long milliseconds = Duration.between(startTime, ZonedDateTime.now(clock)).toMillis();
@@ -41,57 +41,63 @@ public class SudokuResolver {
         return cells;
     }
 
-    private void tryFillCells(Collection<Cell> prevFilledCells, Collection<Cell> allFilledCells, Table table) {
+    private void processCells(Collection<Cell> prevFilledCells, Collection<Cell> allFilledCells, Table table) {
         List<Cell> nextFilledCells = new ArrayList<>();
-        prevFilledCells.forEach(cell -> tryFillEmptyConnectedCells(cell, nextFilledCells));
+        prevFilledCells.forEach(cell -> processConnectedCells(cell, nextFilledCells));
         if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
-            removeSameVariants(table, nextFilledCells, Cell::isFromThisRow);
+            processExchangeableCells(table, nextFilledCells, Cell::isFromThisRow);
         }
         if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
-            removeSameVariants(table, nextFilledCells, Cell::isFromThisColumn);
+            processExchangeableCells(table, nextFilledCells, Cell::isFromThisColumn);
         }
         if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
-            removeSameVariants(table, nextFilledCells, Cell::isFromThisSubTable);
+            processExchangeableCells(table, nextFilledCells, Cell::isFromThisSubTable);
         }
         if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
-            removeExclusiveVariants(table, nextFilledCells, Cell::isFromThisRow);
+            processUniqueCells(table, nextFilledCells, Cell::isFromThisRow);
         }
         if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
-            removeExclusiveVariants(table, nextFilledCells, Cell::isFromThisColumn);
+            processUniqueCells(table, nextFilledCells, Cell::isFromThisColumn);
         }
         if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
-            removeExclusiveVariants(table, nextFilledCells, Cell::isFromThisSubTable);
+            processUniqueCells(table, nextFilledCells, Cell::isFromThisSubTable);
         }
         if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
-            removeGroupedVariants(table, nextFilledCells, Cell::isFromThisRow, Cell::isFromThisSubTable);
+            processIntersectionCells(table, nextFilledCells, Cell::isFromThisRow, Cell::isFromThisSubTable);
         }
         if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
-            removeGroupedVariants(table, nextFilledCells, Cell::isFromThisColumn, Cell::isFromThisSubTable);
+            processIntersectionCells(table, nextFilledCells, Cell::isFromThisColumn, Cell::isFromThisSubTable);
         }
         if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
-            removeGroupedVariants(table, nextFilledCells, Cell::isFromThisSubTable, Cell::isFromThisRow);
+            processIntersectionCells(table, nextFilledCells, Cell::isFromThisSubTable, Cell::isFromThisRow);
         }
         if (nextFilledCells.isEmpty() && allFilledCells.size() < CELLS_NUMBER) {
-            removeGroupedVariants(table, nextFilledCells, Cell::isFromThisSubTable, Cell::isFromThisColumn);
+            processIntersectionCells(table, nextFilledCells, Cell::isFromThisSubTable, Cell::isFromThisColumn);
         }
         allFilledCells.addAll(nextFilledCells);
         if (nextFilledCells.isEmpty()) {
             return;
         }
-        tryFillCells(nextFilledCells, allFilledCells, table);
+        processCells(nextFilledCells, allFilledCells, table);
     }
 
-    private void removeSameVariants(Table table, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
+    private void processConnectedCells(Cell cell, List<Cell> filledCells) {
+        cell.getActualEmptyConnectedCells()
+                .filter(connectedCell -> connectedCell.tryExcludeVariantAndSetValue(cell.getValue()))
+                .forEach(filledCells::add);
+    }
+
+    private void processExchangeableCells(Table table, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
         Stream<Cell> cells = table.getEmptyCellStream();
-        cells.forEach(cell -> removeSameVariants(cell, filledCells, condition));
+        cells.forEach(cell -> processExchangeableCells(cell, filledCells, condition));
     }
 
-    private void removeSameVariants(Cell cell, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
+    private void processExchangeableCells(Cell cell, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
         Stream<Cell> cells = cell.getActualEmptyConnectedCellsAndThis();
-        tryFillSameVariantsConnectedCells(cells.filter(c -> condition.test(c, cell)), filledCells);
+        processExchangeableCells(cells.filter(c -> condition.test(c, cell)), filledCells);
     }
 
-    private void tryFillSameVariantsConnectedCells(Stream<Cell> cellStream, List<Cell> filledCells) {
+    private void processExchangeableCells(Stream<Cell> cellStream, List<Cell> filledCells) {
         List<Cell> cells = cellStream.collect(Collectors.toList());
         for (Cell cell : cells) {
             List<Cell> sameVariantsConnectedCells = cells
@@ -109,17 +115,17 @@ public class SudokuResolver {
         }
     }
 
-    private void removeExclusiveVariants(Table table, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
+    private void processUniqueCells(Table table, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
         Stream<Cell> cells = table.getEmptyCellStream();
-        cells.forEach(cell -> removeExclusiveVariants(cell, filledCells, condition));
+        cells.forEach(cell -> processUniqueCells(cell, filledCells, condition));
     }
 
-    private void removeExclusiveVariants(Cell cell, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
+    private void processUniqueCells(Cell cell, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
         Stream<Cell> cells = cell.getActualEmptyConnectedCellsAndThis();
-        tryFillExclusiveVariantsConnectedCells(cells.filter(c -> condition.test(c, cell)), filledCells);
+        processUniqueCells(cells.filter(c -> condition.test(c, cell)), filledCells);
     }
 
-    private void tryFillExclusiveVariantsConnectedCells(Stream<Cell> cellStream, List<Cell> filledCells) {
+    private void processUniqueCells(Stream<Cell> cellStream, List<Cell> filledCells) {
         Map<Integer, List<Cell>> cells = getCellsByVariant(cellStream);
         cells.entrySet()
                 .stream()
@@ -129,20 +135,20 @@ public class SudokuResolver {
                 .forEach(filledCells::add);
     }
 
-    private void removeGroupedVariants(Table table, List<Cell> filledCells,
+    private void processIntersectionCells(Table table, List<Cell> filledCells,
                                        BiPredicate<Cell, Cell> condition, BiPredicate<Cell, Cell> groupCondition) {
         Stream<Cell> cells = table.getEmptyCellStream();
-        cells.forEach(cell -> removeGroupedVariants(cell, filledCells, condition, groupCondition));
+        cells.forEach(cell -> processIntersectionCells(cell, filledCells, condition, groupCondition));
     }
 
-    private void removeGroupedVariants(Cell cell, List<Cell> filledCells,
+    private void processIntersectionCells(Cell cell, List<Cell> filledCells,
                                        BiPredicate<Cell, Cell> condition, BiPredicate<Cell, Cell> groupCondition) {
         Stream<Cell> cells = cell.getActualEmptyConnectedCellsAndThis();
-        tryFillGroupedVariantsConnectedCells(cell, cells.filter(c ->
+        processIntersectionCells(cell, cells.filter(c ->
                 condition.test(c, cell)), filledCells, condition, groupCondition);
     }
 
-    private void tryFillGroupedVariantsConnectedCells(Cell cell, Stream<Cell> cellStream, List<Cell> filledCells,
+    private void processIntersectionCells(Cell cell, Stream<Cell> cellStream, List<Cell> filledCells,
                                                       BiPredicate<Cell, Cell> condition,
                                                       BiPredicate<Cell, Cell> groupCondition) {
         Map<Integer, List<Cell>> cells = getCellsByVariant(cellStream);
@@ -156,12 +162,6 @@ public class SudokuResolver {
                 .filter(c -> !condition.test(c, cell))
                 .filter(c -> groupCondition.test(c, cell))
                 .filter(c -> c.tryExcludeVariantsAndSetValue(variants))
-                .forEach(filledCells::add);
-    }
-
-    private void tryFillEmptyConnectedCells(Cell cell, List<Cell> filledCells) {
-        cell.getActualEmptyConnectedCells()
-                .filter(connectedCell -> connectedCell.tryExcludeVariantAndSetValue(cell.getValue()))
                 .forEach(filledCells::add);
     }
 
