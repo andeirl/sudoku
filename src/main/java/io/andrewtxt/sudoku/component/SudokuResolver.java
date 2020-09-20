@@ -106,13 +106,10 @@ public class SudokuResolver {
     }
 
     private void processUniqueCells(Cell cell, List<Cell> filledCells, BiPredicate<Cell, Cell> condition) {
-        Stream<Cell> cells = cell.getActualEmptyConnectedCellsAndThis();
-        processUniqueCells(cells.filter(c -> condition.test(c, cell)), filledCells);
-    }
-
-    private void processUniqueCells(Stream<Cell> cellStream, List<Cell> filledCells) {
-        Map<Integer, List<Cell>> cells = getCellsByVariant(cellStream);
-        cells.entrySet()
+        Stream<Cell> emptyCells = cell.getActualEmptyConnectedCellsAndThis();
+        List<Cell> cells = emptyCells.filter(c -> condition.test(c, cell)).collect(Collectors.toList());
+        getCellsByVariant(cells.stream())
+                .entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().size() == 1)
                 .filter(entry -> entry.getValue().get(0).trySetValue(entry.getKey()))
