@@ -135,15 +135,15 @@ public class SudokuResolver {
     }
 
     private void processIntersectionCells(List<Cell> intersectionCells, List<Cell> groupCells, List<Cell> result,
-                                          Integer variant) {
+                                          Byte variant) {
         groupCells.stream()
                 .filter(cell -> !intersectionCells.contains(cell))
                 .filter(c -> c.tryExcludeVariantAndSetValue(variant))
                 .forEach(result::add);
     }
 
-    private Map<Integer, List<Cell>> getCellsByVariant(Stream<Cell> cells) {
-        Map<Integer, List<Cell>> cellMap = new TreeMap<>();
+    private Map<Byte, List<Cell>> getCellsByVariant(Stream<Cell> cells) {
+        Map<Byte, List<Cell>> cellMap = new TreeMap<>();
         cells.forEach(cell -> cell.getRemainingVariants().forEach(variant ->
                 cellMap.computeIfAbsent(variant, v -> new ArrayList<>()).add(cell)));
         return cellMap;

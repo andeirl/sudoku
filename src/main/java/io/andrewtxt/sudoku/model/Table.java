@@ -54,7 +54,7 @@ public class Table {
         for (int i = 0; i < ROW_NUMBER; i++) {
             result.add(new ArrayList<>());
             for (int j = 0; j < COLUMN_NUMBER; j++) {
-                result.get(i).add(new Cell(i, j, values[i][j], this));
+                result.get(i).add(new Cell(i, j, (byte) values[i][j], this));
             }
         }
         return result;
@@ -64,7 +64,7 @@ public class Table {
         cells.stream().flatMap(Collection::stream).forEach(Cell::initEmptyConnectedCells);
     }
 
-    private boolean hasValue(Stream<Cell> cells, Integer value) {
+    private boolean hasValue(Stream<Cell> cells, Byte value) {
         return cells.map(Cell::getValue).filter(Objects::nonNull).anyMatch(cellValue -> cellValue.equals(value));
     }
 

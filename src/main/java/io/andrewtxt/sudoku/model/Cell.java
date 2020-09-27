@@ -12,21 +12,22 @@ public class Cell {
 
     private static final String VALUE_FORMAT = "         ";
 
-    private static final List<Integer> VARIANTS = IntStream
+    private static final List<Byte> VARIANTS = IntStream
             .range(1, Cell.SUB_TABLE_ROW_NUMBER * Cell.SUB_TABLE_COLUMN_NUMBER + 1)
             .boxed()
+            .map(Integer::byteValue)
             .collect(Collectors.toList());
 
     private final int rowIndex;
     private final int columnIndex;
 
-    private Integer value;
+    private Byte value;
     private List<Cell> initialEmptyConnectedCells;
 
-    private final List<Integer> remainingVariants;
+    private final List<Byte> remainingVariants;
     private final Table parentTable;
 
-    public Cell(int rowIndex, int columnIndex, int value, Table parentTable) {
+    public Cell(int rowIndex, int columnIndex, byte value, Table parentTable) {
         this.rowIndex = rowIndex;
         this.columnIndex = columnIndex;
         this.value = value == 0 ? null : value;
@@ -37,11 +38,11 @@ public class Cell {
         }
     }
 
-    public Integer getValue() {
+    public Byte getValue() {
         return value;
     }
 
-    public List<Integer> getRemainingVariants() {
+    public List<Byte> getRemainingVariants() {
         return remainingVariants;
     }
 
@@ -64,7 +65,7 @@ public class Cell {
                 .collect(Collectors.joining(""));
     }
 
-    public boolean tryExcludeVariantAndSetValue(Integer variantToExclude) {
+    public boolean tryExcludeVariantAndSetValue(Byte variantToExclude) {
         remainingVariants.remove(variantToExclude);
         if (remainingVariants.size() == 1) {
             value = remainingVariants.remove(0);
@@ -72,12 +73,12 @@ public class Cell {
         return value != null;
     }
 
-    public boolean tryExcludeVariantsAndSetValue(List<Integer> variantsToExclude) {
+    public boolean tryExcludeVariantsAndSetValue(List<Byte> variantsToExclude) {
         variantsToExclude.forEach(this::tryExcludeVariantAndSetValue);
         return value != null;
     }
 
-    public boolean trySetValue(Integer value) {
+    public boolean trySetValue(Byte value) {
         if (remainingVariants.contains(value)) {
             this.value = value;
             remainingVariants.clear();
