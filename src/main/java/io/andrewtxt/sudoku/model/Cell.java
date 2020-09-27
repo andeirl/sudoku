@@ -7,13 +7,12 @@ import java.util.stream.Stream;
 
 public class Cell {
 
-    public static final int SUB_TABLE_ROW_NUMBER = 3;
-    public static final int SUB_TABLE_COLUMN_NUMBER = 3;
+    public static final byte SUB_TABLE_SIDE_SIZE = 3;
 
     private static final String VALUE_FORMAT = "         ";
 
     private static final List<Byte> VARIANTS = IntStream
-            .range(1, Cell.SUB_TABLE_ROW_NUMBER * Cell.SUB_TABLE_COLUMN_NUMBER + 1)
+            .range(1, Cell.SUB_TABLE_SIDE_SIZE * Cell.SUB_TABLE_SIDE_SIZE + 1)
             .boxed()
             .map(Integer::byteValue)
             .collect(Collectors.toList());
@@ -130,8 +129,8 @@ public class Cell {
     }
 
     public boolean isFromThisSubTable(Cell cell) {
-        return (rowIndex / SUB_TABLE_ROW_NUMBER == cell.rowIndex / SUB_TABLE_ROW_NUMBER) &&
-                (columnIndex / SUB_TABLE_COLUMN_NUMBER == cell.columnIndex / SUB_TABLE_COLUMN_NUMBER);
+        return (rowIndex / SUB_TABLE_SIDE_SIZE == cell.rowIndex / SUB_TABLE_SIDE_SIZE) &&
+                (columnIndex / SUB_TABLE_SIDE_SIZE == cell.columnIndex / SUB_TABLE_SIDE_SIZE);
     }
 
 }

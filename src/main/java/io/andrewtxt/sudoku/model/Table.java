@@ -6,8 +6,7 @@ import java.util.stream.Stream;
 
 public class Table {
 
-    public static final int ROW_NUMBER = 9;
-    public static final int COLUMN_NUMBER = 9;
+    public static final byte SIDE_SIZE = 9;
 
     private final List<List<Cell>> cells;
 
@@ -39,7 +38,7 @@ public class Table {
     @Override
     public String toString() {
         List<String> lines = new ArrayList<>();
-        for (int i = 0; i < ROW_NUMBER; i++) {
+        for (int i = 0; i < SIDE_SIZE; i++) {
             String line = cells.get(i)
                     .stream()
                     .map(Object::toString)
@@ -51,9 +50,9 @@ public class Table {
 
     private List<List<Cell>> toCells(Byte[][] values) {
         List<List<Cell>> result = new ArrayList<>();
-        for (byte i = 0; i < ROW_NUMBER; i++) {
+        for (byte i = 0; i < SIDE_SIZE; i++) {
             result.add(new ArrayList<>());
-            for (byte j = 0; j < COLUMN_NUMBER; j++) {
+            for (byte j = 0; j < SIDE_SIZE; j++) {
                 result.get(i).add(new Cell(i, j, values[i][j], this));
             }
         }

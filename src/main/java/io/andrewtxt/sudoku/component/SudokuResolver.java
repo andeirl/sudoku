@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 public class SudokuResolver {
 
-    private static final int CELLS_NUMBER = Table.ROW_NUMBER * Table.COLUMN_NUMBER;
+    private static final byte CELLS_NUMBER = Table.SIDE_SIZE * Table.SIDE_SIZE;
 
     public Table resolve(Byte[][] values) {
         Clock clock = Clock.systemUTC();
@@ -44,14 +44,20 @@ public class SudokuResolver {
         processCells(nextFilledCells, allFilledCells, table);
     }
 
-    private void mainSteps(Collection<Cell> prevFilledCells, List<Cell> nextFilledCells) {
-        prevFilledCells.forEach(cell -> processConnectedCells(cell, nextFilledCells));
+    private void mainSteps(Collection<Cell> prevFilledCells, List<Cell> result) {
+        prevFilledCells.forEach(cell -> processConnectedCells(cell, result));
     }
 
-    private void additionalSteps(Table table, List<Cell> nextFilledCells) {
-        processExchangeableCells(table, nextFilledCells);
-        processUniqueCells(table, nextFilledCells);
-        processIntersectionCells(table, nextFilledCells);
+    private void additionalSteps(Table table, List<Cell> result) {
+        if (result.isEmpty()) {
+            processExchangeableCells(table, result);
+        }
+        if (result.isEmpty()) {
+            processUniqueCells(table, result);
+        }
+        if (result.isEmpty()) {
+            processIntersectionCells(table, result);
+        }
     }
 
     private void processConnectedCells(Cell cell, List<Cell> result) {
@@ -61,9 +67,6 @@ public class SudokuResolver {
     }
 
     private void processExchangeableCells(Table table, List<Cell> result) {
-        if (!result.isEmpty()) {
-            return;
-        }
         table.emptyCells().forEach(cell -> processExchangeableCells(cell, result, Cell::isFromThisRow));
         table.emptyCells().forEach(cell -> processExchangeableCells(cell, result, Cell::isFromThisColumn));
         table.emptyCells().forEach(cell -> processExchangeableCells(cell, result, Cell::isFromThisSubTable));
@@ -86,9 +89,6 @@ public class SudokuResolver {
     }
 
     private void processUniqueCells(Table table, List<Cell> result) {
-        if (!result.isEmpty()) {
-            return;
-        }
         table.emptyCells().forEach(cell -> processUniqueCells(cell, result, Cell::isFromThisRow));
         table.emptyCells().forEach(cell -> processUniqueCells(cell, result, Cell::isFromThisColumn));
         table.emptyCells().forEach(cell -> processUniqueCells(cell, result, Cell::isFromThisSubTable));
@@ -108,9 +108,6 @@ public class SudokuResolver {
     }
 
     private void processIntersectionCells(Table table, List<Cell> result) {
-        if (!result.isEmpty()) {
-            return;
-        }
         table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
                 Cell::isFromThisRow, Cell::isFromThisSubTable));
         table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
@@ -129,7 +126,7 @@ public class SudokuResolver {
         getCellsByVariant(cells.stream())
                 .entrySet()
                 .stream()
-                .filter(entry -> entry.getValue().size() > 1 && entry.getValue().size() <= Cell.SUB_TABLE_ROW_NUMBER)
+                .filter(entry -> entry.getValue().size() > 1 && entry.getValue().size() <= Cell.SUB_TABLE_SIDE_SIZE)
                 .filter(entry -> entry.getValue().stream().allMatch(c -> groupCondition.test(c, cell)))
                 .forEach(entry -> processIntersectionCells(entry.getValue(), groupCells, result, entry.getKey()));
     }
