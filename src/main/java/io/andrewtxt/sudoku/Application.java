@@ -7,7 +7,7 @@ public class Application {
 
     public static void main(String[] args) {
         System.out.println("Application is started");
-        int[][] data = new DataReader().readData();
+        Byte[][] data = new DataReader().readData();
         new SudokuResolver().resolve(data);
         System.out.println("Application is stopped");
     }

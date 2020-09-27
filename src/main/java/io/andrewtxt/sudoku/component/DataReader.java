@@ -13,8 +13,8 @@ public class DataReader {
     private static final String LINE_REGEXP = String.format("^[0-%s]{%s}$", Table.ROW_NUMBER, Table.ROW_NUMBER);
     private static final Pattern LINE_PATTERN = Pattern.compile(LINE_REGEXP);
 
-    public int[][] readData() {
-        int[][] result = new int[Table.ROW_NUMBER][Table.COLUMN_NUMBER];
+    public Byte[][] readData() {
+        Byte[][] result = new Byte[Table.ROW_NUMBER][Table.COLUMN_NUMBER];
         try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(FILE_NAME);
              Reader inputStreamReader = new InputStreamReader(inputStream);
              BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
@@ -28,7 +28,7 @@ public class DataReader {
         }
     }
 
-    private int[] validateAndParseLine(String line) {
+    private Byte[] validateAndParseLine(String line) {
         if (line == null) {
             throw new IllegalArgumentException("Not enough rows, minimal number is " + Table.ROW_NUMBER);
         }
@@ -37,8 +37,8 @@ public class DataReader {
             throw new IllegalArgumentException("Line must be of strictly " + Table.COLUMN_NUMBER + " digits");
         }
         return Arrays.stream(lineForParse.split(""))
-                .mapToInt(Integer::parseInt)
-                .toArray();
+                .map(Byte::parseByte)
+                .toArray(Byte[]::new);
     }
 
 }

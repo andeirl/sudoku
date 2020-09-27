@@ -8,7 +8,7 @@ public class SudokuResolverTest {
 
     @Test
     public void testSuccessSimple() {
-        int[][] values = new int[][] {
+        Byte[][] values = new Byte[][] {
                 {0, 1, 3, 8, 0, 0, 4, 0, 5},
                 {0, 2, 4, 6, 0, 5, 0, 0, 0},
                 {0, 8, 7, 0, 0, 0, 9, 3, 0},
@@ -26,7 +26,7 @@ public class SudokuResolverTest {
 
     @Test
     public void testSuccessComplex() {
-        int[][] values = new int[][] {
+        Byte[][] values = new Byte[][] {
                 {0, 0, 2, 0, 0, 0, 0, 4, 1},
                 {0, 0, 0, 0, 8, 2, 0, 7, 0},
                 {0, 0, 0, 0, 4, 0, 0, 0, 9},

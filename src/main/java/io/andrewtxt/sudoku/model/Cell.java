@@ -18,8 +18,8 @@ public class Cell {
             .map(Integer::byteValue)
             .collect(Collectors.toList());
 
-    private final int rowIndex;
-    private final int columnIndex;
+    private final byte rowIndex;
+    private final byte columnIndex;
 
     private Byte value;
     private List<Cell> initialEmptyConnectedCells;
@@ -27,7 +27,7 @@ public class Cell {
     private final List<Byte> remainingVariants;
     private final Table parentTable;
 
-    public Cell(int rowIndex, int columnIndex, byte value, Table parentTable) {
+    public Cell(byte rowIndex, byte columnIndex, byte value, Table parentTable) {
         this.rowIndex = rowIndex;
         this.columnIndex = columnIndex;
         this.value = value == 0 ? null : value;

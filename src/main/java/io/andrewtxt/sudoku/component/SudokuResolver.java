@@ -15,7 +15,7 @@ public class SudokuResolver {
 
     private static final int CELLS_NUMBER = Table.ROW_NUMBER * Table.COLUMN_NUMBER;
 
-    public Table resolve(int[][] values) {
+    public Table resolve(Byte[][] values) {
         Clock clock = Clock.systemUTC();
         ZonedDateTime startTime = ZonedDateTime.now();
 
