@@ -8,12 +8,15 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.BiPredicate;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SudokuResolver {
 
     private static final byte CELLS_NUMBER = Table.SIDE_SIZE * Table.SIDE_SIZE;
+
+    private static final Logger LOG = Logger.getLogger(SudokuResolver.class.getName());
 
     public Table resolve(Byte[][] values) {
         Clock clock = Clock.systemUTC();
@@ -26,9 +29,9 @@ public class SudokuResolver {
         boolean solved = filledCells.size() == CELLS_NUMBER;
         long milliseconds = Duration.between(startTime, ZonedDateTime.now(clock)).toMillis();
 
-        System.out.println(solved ? "Sudoku is solved" : "Sudoku has no solution");
-        System.out.println("Time of algorithm working: " + milliseconds + " milliseconds");
-        System.out.println(table);
+        LOG.info(solved ? "Sudoku is solved" : "Sudoku has no solution");
+        LOG.info("Time of algorithm working: " + milliseconds + " milliseconds");
+        LOG.info("Result table: \n" + table.toString());
 
         return table;
     }

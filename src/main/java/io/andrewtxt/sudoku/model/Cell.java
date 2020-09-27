@@ -9,7 +9,7 @@ public class Cell {
 
     public static final byte SUB_TABLE_SIDE_SIZE = 3;
 
-    private static final String VALUE_FORMAT = "         ";
+    private static final String VARIANTS_FORMAT = "%-9s ";
 
     private static final List<Byte> VARIANTS = IntStream
             .range(1, Cell.SUB_TABLE_SIDE_SIZE * Cell.SUB_TABLE_SIDE_SIZE + 1)
@@ -104,11 +104,8 @@ public class Cell {
 
     @Override
     public String toString() {
-        if (value == null) {
-            String variantsStr = getVariantsAsKey();
-            return " " + variantsStr + VALUE_FORMAT.substring(variantsStr.length()) + " ";
-        }
-        return " " + value.toString() + VALUE_FORMAT.substring(1) + " ";
+        String variants = value == null ? getVariantsAsKey() : value.toString();
+        return String.format(VARIANTS_FORMAT, variants);
     }
 
     void initEmptyConnectedCells() {
