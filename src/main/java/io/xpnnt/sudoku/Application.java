@@ -1,7 +1,7 @@
-package io.andrewtxt.sudoku;
+package io.xpnnt.sudoku;
 
-import io.andrewtxt.sudoku.component.DataReader;
-import io.andrewtxt.sudoku.component.SudokuResolver;
+import io.xpnnt.sudoku.component.DataReader;
+import io.xpnnt.sudoku.component.SudokuResolver;
 
 import java.util.logging.Logger;
 

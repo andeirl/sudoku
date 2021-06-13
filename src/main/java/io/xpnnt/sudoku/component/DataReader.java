@@ -1,6 +1,6 @@
-package io.andrewtxt.sudoku.component;
+package io.xpnnt.sudoku.component;
 
-import io.andrewtxt.sudoku.model.Table;
+import io.xpnnt.sudoku.model.Table;
 
 import java.io.*;
 import java.util.Arrays;

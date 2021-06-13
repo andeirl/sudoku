@@ -1,7 +1,7 @@
-package io.andrewtxt.sudoku.component;
+package io.xpnnt.sudoku.component;
 
-import io.andrewtxt.sudoku.model.Cell;
-import io.andrewtxt.sudoku.model.Table;
+import io.xpnnt.sudoku.model.Cell;
+import io.xpnnt.sudoku.model.Table;
 
 import java.time.Clock;
 import java.time.Duration;

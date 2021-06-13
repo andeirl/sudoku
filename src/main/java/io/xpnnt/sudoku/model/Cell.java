@@ -1,4 +1,4 @@
-package io.andrewtxt.sudoku.model;
+package io.xpnnt.sudoku.model;
 
 import java.util.*;
 import java.util.stream.Collectors;
