@@ -65,8 +65,8 @@ public class SudokuResolver {
 
     private void processConnectedCells(Cell cell, List<Cell> result) {
         cell.actualEmptyConnectedCells()
-                .filter(connectedCell -> connectedCell.tryExcludeVariantAndSetValue(cell.getValue()))
-                .forEach(result::add);
+            .filter(connectedCell -> connectedCell.tryExcludeVariantAndSetValue(cell.getValue()))
+            .forEach(result::add);
     }
 
     private void processExchangeableCells(Table table, List<Cell> result) {
@@ -79,16 +79,16 @@ public class SudokuResolver {
         Stream<Cell> emptyCells = cell.actualEmptyConnectedCellsAndThis();
         List<Cell> cells = emptyCells.filter(c -> condition.test(c, cell)).collect(Collectors.toList());
         cellsByVariants(cells.stream())
-                .filter(list -> list.size() > 1)
-                .filter(list -> list.get(0).getRemainingVariants().size() == list.size())
-                .forEach(list -> processExchangeableCells(list, cells, result));
+            .filter(list -> list.size() > 1)
+            .filter(list -> list.get(0).getRemainingVariants().size() == list.size())
+            .forEach(list -> processExchangeableCells(list, cells, result));
     }
 
     private void processExchangeableCells(List<Cell> exchangeableCells, List<Cell> cells, List<Cell> result) {
         cells.stream()
-                .filter(cell -> !exchangeableCells.contains(cell))
-                .filter(cell -> cell.tryExcludeVariantsAndSetValue(exchangeableCells.get(0).getRemainingVariants()))
-                .forEach(result::add);
+            .filter(cell -> !exchangeableCells.contains(cell))
+            .filter(cell -> cell.tryExcludeVariantsAndSetValue(exchangeableCells.get(0).getRemainingVariants()))
+            .forEach(result::add);
     }
 
     private void processUniqueCells(Table table, List<Cell> result) {
@@ -101,24 +101,24 @@ public class SudokuResolver {
         Stream<Cell> emptyCells = cell.actualEmptyConnectedCellsAndThis();
         List<Cell> cells = emptyCells.filter(c -> condition.test(c, cell)).collect(Collectors.toList());
         getCellsByVariant(cells.stream())
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getValue().size() == 1)
-                .filter(entry -> result.stream().noneMatch(c -> c.getValue().equals(entry.getKey())))
-                .filter(entry -> entry.getValue().get(0).trySetValue(entry.getKey()))
-                .map(entry -> entry.getValue().get(0))
-                .forEach(result::add);
+            .entrySet()
+            .stream()
+            .filter(entry -> entry.getValue().size() == 1)
+            .filter(entry -> result.stream().noneMatch(c -> c.getValue().equals(entry.getKey())))
+            .filter(entry -> entry.getValue().get(0).trySetValue(entry.getKey()))
+            .map(entry -> entry.getValue().get(0))
+            .forEach(result::add);
     }
 
     private void processIntersectionCells(Table table, List<Cell> result) {
         table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
-                Cell::isFromThisRow, Cell::isFromThisSubTable));
+            Cell::isFromThisRow, Cell::isFromThisSubTable));
         table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
-                Cell::isFromThisColumn, Cell::isFromThisSubTable));
+            Cell::isFromThisColumn, Cell::isFromThisSubTable));
         table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
-                Cell::isFromThisSubTable, Cell::isFromThisRow));
+            Cell::isFromThisSubTable, Cell::isFromThisRow));
         table.emptyCells().forEach(cell -> processIntersectionCells(cell, result,
-                Cell::isFromThisSubTable, Cell::isFromThisColumn));
+            Cell::isFromThisSubTable, Cell::isFromThisColumn));
     }
 
     private void processIntersectionCells(Cell cell, List<Cell> result,
@@ -127,25 +127,25 @@ public class SudokuResolver {
         List<Cell> cells = emptyCells.filter(c -> condition.test(c, cell)).collect(Collectors.toList());
         List<Cell> groupCells = emptyCells.filter(c -> groupCondition.test(c, cell)).collect(Collectors.toList());
         getCellsByVariant(cells.stream())
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getValue().size() > 1 && entry.getValue().size() <= Cell.SUB_TABLE_SIDE_SIZE)
-                .filter(entry -> entry.getValue().stream().allMatch(c -> groupCondition.test(c, cell)))
-                .forEach(entry -> processIntersectionCells(entry.getValue(), groupCells, result, entry.getKey()));
+            .entrySet()
+            .stream()
+            .filter(entry -> entry.getValue().size() > 1 && entry.getValue().size() <= Cell.SUB_TABLE_SIDE_SIZE)
+            .filter(entry -> entry.getValue().stream().allMatch(c -> groupCondition.test(c, cell)))
+            .forEach(entry -> processIntersectionCells(entry.getValue(), groupCells, result, entry.getKey()));
     }
 
     private void processIntersectionCells(List<Cell> intersectionCells, List<Cell> groupCells, List<Cell> result,
                                           Byte variant) {
         groupCells.stream()
-                .filter(cell -> !intersectionCells.contains(cell))
-                .filter(c -> c.tryExcludeVariantAndSetValue(variant))
-                .forEach(result::add);
+            .filter(cell -> !intersectionCells.contains(cell))
+            .filter(c -> c.tryExcludeVariantAndSetValue(variant))
+            .forEach(result::add);
     }
 
     private Map<Byte, List<Cell>> getCellsByVariant(Stream<Cell> cells) {
         Map<Byte, List<Cell>> cellMap = new TreeMap<>();
         cells.forEach(cell -> cell.getRemainingVariants().forEach(variant ->
-                cellMap.computeIfAbsent(variant, v -> new ArrayList<>()).add(cell)));
+            cellMap.computeIfAbsent(variant, v -> new ArrayList<>()).add(cell)));
         return cellMap;
     }
 

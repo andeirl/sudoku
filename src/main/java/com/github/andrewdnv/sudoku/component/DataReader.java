@@ -37,8 +37,8 @@ public class DataReader {
             throw new IllegalArgumentException("Line must be of strictly " + Table.SIDE_SIZE + " digits");
         }
         return Arrays.stream(lineForParse.split(""))
-                .map(Byte::parseByte)
-                .toArray(Byte[]::new);
+            .map(Byte::parseByte)
+            .toArray(Byte[]::new);
     }
 
 }
