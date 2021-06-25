@@ -1,7 +1,7 @@
-package io.xpnnt.sudoku.component;
+package com.github.andrewdnv.sudoku.component;
 
-import io.xpnnt.sudoku.model.Cell;
-import io.xpnnt.sudoku.model.Table;
+import com.github.andrewdnv.sudoku.model.Cell;
+import com.github.andrewdnv.sudoku.model.Table;
 
 import java.time.Clock;
 import java.time.Duration;

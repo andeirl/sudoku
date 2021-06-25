@@ -1,4 +1,4 @@
-package io.xpnnt.sudoku.model;
+package com.github.andrewdnv.sudoku.model;
 
 import java.util.*;
 import java.util.stream.Collectors;

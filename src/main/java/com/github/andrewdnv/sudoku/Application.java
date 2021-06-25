@@ -1,7 +1,7 @@
-package io.xpnnt.sudoku;
+package com.github.andrewdnv.sudoku;
 
-import io.xpnnt.sudoku.component.DataReader;
-import io.xpnnt.sudoku.component.SudokuResolver;
+import com.github.andrewdnv.sudoku.component.DataReader;
+import com.github.andrewdnv.sudoku.component.SudokuResolver;
 
 import java.util.logging.Logger;
 
