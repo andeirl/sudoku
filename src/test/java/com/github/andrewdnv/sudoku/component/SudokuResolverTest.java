@@ -1,6 +1,6 @@
-package io.andrewtxt.sudoku.component;
+package com.github.andrewdnv.sudoku.component;
 
-import io.andrewtxt.sudoku.model.Table;
+import com.github.andrewdnv.sudoku.model.Table;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 

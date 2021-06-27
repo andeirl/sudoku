@@ -1,4 +1,4 @@
-package io.andrewtxt.sudoku.model;
+package com.github.andrewdnv.sudoku.model;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,9 +40,9 @@ public class Table {
         List<String> lines = new ArrayList<>();
         for (int i = 0; i < SIDE_SIZE; i++) {
             String line = cells.get(i)
-                    .stream()
-                    .map(Object::toString)
-                    .collect(Collectors.joining(""));
+                .stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(""));
             lines.add(line);
         }
         return String.join("\n", lines);

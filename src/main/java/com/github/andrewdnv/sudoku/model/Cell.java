@@ -1,4 +1,4 @@
-package io.andrewtxt.sudoku.model;
+package com.github.andrewdnv.sudoku.model;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,10 +12,10 @@ public class Cell {
     private static final String VARIANTS_FORMAT = "%-9s ";
 
     private static final List<Byte> VARIANTS = IntStream
-            .range(1, Cell.SUB_TABLE_SIDE_SIZE * Cell.SUB_TABLE_SIDE_SIZE + 1)
-            .boxed()
-            .map(Integer::byteValue)
-            .collect(Collectors.toList());
+        .range(1, Cell.SUB_TABLE_SIDE_SIZE * Cell.SUB_TABLE_SIDE_SIZE + 1)
+        .boxed()
+        .map(Integer::byteValue)
+        .collect(Collectors.toList());
 
     private final byte rowIndex;
     private final byte columnIndex;
@@ -59,9 +59,9 @@ public class Cell {
 
     public String getVariantsAsKey() {
         return remainingVariants
-                .stream()
-                .map(Object::toString)
-                .collect(Collectors.joining(""));
+            .stream()
+            .map(Object::toString)
+            .collect(Collectors.joining(""));
     }
 
     public boolean tryExcludeVariantAndSetValue(Byte variantToExclude) {
@@ -114,7 +114,7 @@ public class Cell {
 
     private boolean isConnected(Cell cell) {
         return !this.equals(cell) &&
-                (isFromThisRow(cell) || isFromThisColumn(cell) || isFromThisSubTable(cell));
+            (isFromThisRow(cell) || isFromThisColumn(cell) || isFromThisSubTable(cell));
     }
 
     public boolean isFromThisRow(Cell cell) {
@@ -127,7 +127,7 @@ public class Cell {
 
     public boolean isFromThisSubTable(Cell cell) {
         return (rowIndex / SUB_TABLE_SIDE_SIZE == cell.rowIndex / SUB_TABLE_SIDE_SIZE) &&
-                (columnIndex / SUB_TABLE_SIDE_SIZE == cell.columnIndex / SUB_TABLE_SIDE_SIZE);
+            (columnIndex / SUB_TABLE_SIDE_SIZE == cell.columnIndex / SUB_TABLE_SIDE_SIZE);
     }
 
 }
